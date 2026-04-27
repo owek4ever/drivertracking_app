@@ -1,0 +1,144 @@
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+
+export default function ProfileScreen() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>DR</Text>
+          </View>
+          <Text style={styles.name}>Driver Name</Text>
+          <Text style={styles.email}>driver@example.com</Text>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Phone</Text>
+            <Text style={styles.infoValue}>+33 6 00 00 00 00</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>License Number</Text>
+            <Text style={styles.infoValue}>--</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>License Expiry</Text>
+            <Text style={styles.infoValue}>--</Text>
+          </View>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Assigned Vehicle</Text>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Vehicle</Text>
+            <Text style={styles.infoValue}>Not assigned</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>License Plate</Text>
+            <Text style={styles.infoValue}>--</Text>
+          </View>
+        </View>
+
+        <View style={styles.actionsCard}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          
+          <View style={styles.actionRow}>
+            <Text style={styles.actionText}>Logout</Text>
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatarText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 14,
+    color: '#8E8E93',
+  },
+  infoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8E8E93',
+    marginBottom: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  infoLabel: {
+    fontSize: 16,
+    color: '#000000',
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#8E8E93',
+  },
+  actionsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+  },
+  actionRow: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  actionText: {
+    fontSize: 16,
+    color: '#FF3B30',
+    fontWeight: '500',
+  },
+});
