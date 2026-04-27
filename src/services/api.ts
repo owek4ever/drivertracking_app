@@ -52,7 +52,8 @@ async function getApiBaseUrl(): Promise<string> {
   if (!serverUrl) {
     throw new Error('Server URL not configured. Please log in again.');
   }
-  return `${serverUrl}/custom/drivertracking`;
+  // Use Dolibarr native API directly - not custom drivertracking module
+  return `${serverUrl}/api/index.php`;
 }
 
 /**
