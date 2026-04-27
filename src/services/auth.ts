@@ -41,10 +41,10 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     // First, store the server URL (needed for all API calls)
     await setServerUrl(credentials.serverUrl);
     
-    // Now make the login request
-    // Note: Login may use DOLAPIKEY or basic auth depending on backend config
-    const response = await apiPost<{ token: string; driver?: Driver }>('/api/login', {
-      username: credentials.username,
+    // Now make the login request to Dolibarr REST API
+    // Endpoint: /api/index.php/login
+    const response = await apiPost<{ token: string; driver?: Driver }>('/api/index.php/login', {
+      login: credentials.username,
       password: credentials.password,
     });
 
