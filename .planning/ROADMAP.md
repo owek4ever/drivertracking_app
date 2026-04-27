@@ -88,7 +88,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Booking Management | 3/3 | Complete | 2026-04-27 |
-| 2. Auth + API Wiring | 1/2 | Executing | 2026-04-27 |
+| 2. Auth + API Wiring | 2/2 | Complete | 2026-04-27 |
 | 3. UI Polish | 0/2 | Not started | - |
 | 4. Profile | 0/1 | Not started | - |
 
