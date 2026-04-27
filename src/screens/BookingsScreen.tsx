@@ -1,64 +1,187 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+/**
+ * Bookings Screen
+ * Displays pending and in-progress bookings with tabs and pull-to-refresh
+ */
 
-interface Booking {
-  id: number;
-  ref: string;
-  status: string;
-  departure_address: string;
-  arriving_address: string;
-  pickup_datetime: string;
-  distance: string;
-}
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { getBookings } from '../services/api';
+import { Booking, BookingStatus } from '../types';
+
+type TabType = 'pending' | 'in_progress';
 
 export default function BookingsScreen() {
-  // Placeholder data - will be replaced with API data
-  const bookings: Booking[] = [];
+  const navigation = useNavigation<any>();
+  const [activeTab, setActiveTab] = useState<TabType>('pending');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      const status = activeTab === 'pending' ? 'confirmed' : 'in_progress';
+      const response = await getBookings(status);
+      
+      if (response.success && response.data) {
+        setBookings(response.data);
+      } else {
+        setBookings([]);
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [activeTab]);
+
+  // Fetch on mount and tab change
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchBookings();
+    }, [fetchBookings])
+  );
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchBookings();
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setLoading(true);
+    setBookings([]);
+  };
+
+  const handleBookingPress = (bookingId: number) => {
+    navigation.navigate('BookingDetail', { bookingId });
+  };
+
+  // Get status badge color
+  const getStatusColor = (status: BookingStatus) => {
+    switch (status) {
+      case 'confirmed':
+        return '#34C759';
+      case 'in_progress':
+        return '#007AFF';
+      case 'done':
+        return '#8E8E93';
+      case 'cancelled':
+        return '#FF3B30';
+      default:
+        return '#8E8E93';
+    }
+  };
+
+  // Format date time
+  const formatDateTime = (dateStr: string | null) => {
+    if (!dateStr) return 'Not scheduled';
+    try {
+      return new Date(dateStr).toLocaleString();
+    } catch {
+      return dateStr;
+    }
+  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>📋</Text>
-      <Text style={styles.emptyTitle}>No Active Bookings</Text>
+      <Text style={styles.emptyTitle}>
+        {activeTab === 'pending' ? 'No Pending Bookings' : 'No In-Progress Bookings'}
+      </Text>
       <Text style={styles.emptyText}>
-        You have no pending or in-progress bookings at the moment.
+        {activeTab === 'pending'
+          ? 'You have no pending bookings at the moment.'
+          : 'You have no bookings currently in progress.'}
       </Text>
     </View>
   );
 
   const renderBookingItem = ({ item }: { item: Booking }) => (
-    <View style={styles.bookingCard}>
+    <TouchableOpacity
+      style={styles.bookingCard}
+      onPress={() => handleBookingPress(item.id)}
+      activeOpacity={0.7}
+    >
       <View style={styles.bookingHeader}>
         <Text style={styles.bookingRef}>{item.ref}</Text>
-        <View style={[styles.statusBadge, styles[`status_${item.status}`] || styles.status_confirmed]}>
-          <Text style={styles.statusText}>{item.status}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+          <Text style={styles.statusText}>{item.status.replace('_', ' ')}</Text>
         </View>
       </View>
       <View style={styles.bookingDetails}>
         <Text style={styles.label}>From:</Text>
-        <Text style={styles.value}>{item.departure_address}</Text>
+        <Text style={styles.value} numberOfLines={1}>{item.departure_address}</Text>
       </View>
       <View style={styles.bookingDetails}>
         <Text style={styles.label}>To:</Text>
-        <Text style={styles.value}>{item.arriving_address}</Text>
+        <Text style={styles.value} numberOfLines={1}>{item.arriving_address}</Text>
       </View>
       <View style={styles.bookingFooter}>
         <Text style={styles.dateTime}>
-          {item.pickup_datetime ? new Date(item.pickup_datetime).toLocaleString() : 'Not scheduled'}
+          {formatDateTime(item.pickup_datetime)}
         </Text>
         <Text style={styles.distance}>{item.distance || '--'} km</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={bookings}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderBookingItem}
-        ListEmptyComponent={renderEmptyState}
-        contentContainerStyle={bookings.length === 0 ? styles.emptyList : styles.list}
-      />
+      {/* Tab Bar */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'pending' && styles.activeTab]}
+          onPress={() => handleTabChange('pending')}
+        >
+          <Text style={[styles.tabText, activeTab === 'pending' && styles.activeTabText]}>
+            Pending
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'in_progress' && styles.activeTab]}
+          onPress={() => handleTabChange('in_progress')}
+        >
+          <Text style={[styles.tabText, activeTab === 'in_progress' && styles.activeTabText]}>
+            In Progress
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading bookings...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={bookings}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderBookingItem}
+          ListEmptyComponent={renderEmptyState}
+          contentContainerStyle={bookings.length === 0 ? styles.emptyList : styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#007AFF']}
+              tintColor="#007AFF"
+            />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -67,6 +190,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F7',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: '#007AFF',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#8E8E93',
+  },
+  activeTabText: {
+    color: '#007AFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#8E8E93',
   },
   list: {
     padding: 16,
@@ -120,18 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#FFFFFF',
-  },
-  status_confirmed: {
-    backgroundColor: '#34C759',
-  },
-  status_in_progress: {
-    backgroundColor: '#007AFF',
-  },
-  status_done: {
-    backgroundColor: '#8E8E93',
-  },
-  status_cancelled: {
-    backgroundColor: '#FF3B30',
+    textTransform: 'capitalize',
   },
   bookingDetails: {
     marginBottom: 8,

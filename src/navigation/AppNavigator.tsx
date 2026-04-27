@@ -6,6 +6,7 @@ import { Text, StyleSheet, View } from 'react-native';
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
 import BookingsScreen from '../screens/BookingsScreen';
+import BookingDetailScreen from '../screens/BookingDetailScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
@@ -16,7 +17,14 @@ export type RootTabParamList = {
   Profile: undefined;
 };
 
+// Stack param list for bookings flow
+export type BookingsStackParamList = {
+  BookingsList: undefined;
+  BookingDetail: { bookingId: number };
+};
+
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const BookingsStack = createNativeStackNavigator<BookingsStackParamList>();
 
 // Simple icon component using text symbols
 const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
@@ -35,6 +43,40 @@ const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
     </View>
   );
 };
+
+// Bookings stack navigator
+function BookingsStackNavigator() {
+  return (
+    <BookingsStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#007AFF',
+        },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: {
+          fontWeight: '600',
+        },
+      }}
+    >
+      <BookingsStack.Screen
+        name="BookingsList"
+        component={BookingsScreen}
+        options={{
+          title: 'Bookings',
+          headerTitle: 'Active Bookings',
+        }}
+      />
+      <BookingsStack.Screen
+        name="BookingDetail"
+        component={BookingDetailScreen}
+        options={{
+          title: 'Booking Details',
+          headerTitle: 'Booking Detail',
+        }}
+      />
+    </BookingsStack.Navigator>
+  );
+}
 
 export default function AppNavigator() {
   return (
@@ -64,10 +106,10 @@ export default function AppNavigator() {
       />
       <Tab.Screen
         name="Bookings"
-        component={BookingsScreen}
+        component={BookingsStackNavigator}
         options={{
           title: 'Bookings',
-          headerTitle: 'Active Bookings',
+          headerShown: false,
         }}
       />
       <Tab.Screen
