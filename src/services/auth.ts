@@ -31,8 +31,19 @@ interface LoginResponse {
 }
 
 /**
+ * Get the Dolibarr API base URL (not Flotte-specific)
+ */
+async function getDolibarrApiUrl(): Promise<string> {
+  const serverUrl = await getServerUrl();
+  if (!serverUrl) {
+    throw new Error('Server URL not configured');
+  }
+  return `${serverUrl}/api/index.php`;
+}
+
+/**
  * Perform login with username, password, and server URL
- * POST to /custom/drivertracking/api/login
+ * POST to /api/index.php/login (Dolibarr REST API)
  * 
  * @param credentials - username, password, and server URL
  */
@@ -42,25 +53,33 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     await setServerUrl(credentials.serverUrl);
     
     // Dolibarr REST API login: /api/index.php/login
-    // Using DOLAPIKEY = password as API key for authentication
-    const response = await apiPost<{ success: boolean; token?: string }>('/api/index.php/login', {
-      login: credentials.username,
-      password: credentials.password,
+    const baseUrl = await getDolibarrApiUrl();
+    const loginUrl = `${baseUrl}/login`;
+    
+    const response = await fetch(loginUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        login: credentials.username,
+        password: credentials.password,
+      }),
     });
-
-    if (response.success && response.data && response.data.token) {
-      // Store token (this is the DOLAPIKEY)
-      await setAuthToken(response.data.token);
-      
+    
+    const data = await response.json();
+    
+    if (response.ok && data.token) {
+      await setAuthToken(data.token);
       return {
         success: true,
-        token: response.data.token,
+        token: data.token,
       };
     }
 
     return {
       success: false,
-      error: response.error || 'Login failed',
+      error: data.error || 'Login failed',
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';

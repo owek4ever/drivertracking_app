@@ -1,7 +1,7 @@
 /**
  * API Service Layer
  * Base API configuration and fetch wrapper
- * Uses /custom/drivertracking/ endpoints
+ * Uses /flotte/ endpoints
  * Uses DOLAPIKEY header for Dolibarr REST API authentication
  */
 
@@ -52,8 +52,8 @@ async function getApiBaseUrl(): Promise<string> {
   if (!serverUrl) {
     throw new Error('Server URL not configured. Please log in again.');
   }
-  // Use Dolibarr native API directly - not custom drivertracking module
-  return `${serverUrl}/api/index.php`;
+  // Use Dolibarr Flotte API
+  return `${serverUrl}/api/index.php/flotte`;
 }
 
 /**
@@ -259,7 +259,7 @@ export async function apiPut<T>(
 
 /**
  * Get dashboard data
- * GET /custom/drivertracking/api_driver.php
+ * GET /flotte/api_driver.php
  * Returns driver info, active booking, vehicle info, pending bookings
  */
 export async function getDashboard(): Promise<ApiResponse<DashboardData>> {
@@ -377,7 +377,7 @@ export async function getBookings(status?: string): Promise<ApiResponse<Booking[
 
 /**
  * Start a booking (set status to in_progress)
- * POST /custom/drivertracking/ajax_start_booking.php
+ * POST /flotte/ajax_start_booking.php
  * Backend auto-captures timestamp - no manual time entry
  */
 export async function startBooking(bookingId: number): Promise<ApiResponse<{ success: boolean; message?: string }>> {
@@ -434,7 +434,7 @@ export async function startBooking(bookingId: number): Promise<ApiResponse<{ suc
 
 /**
  * Update booking status (complete/cancel/undo)
- * POST /custom/drivertracking/ajax_update_booking.php
+ * POST /flotte/ajax_update_booking.php
  * Actions: "complete", "cancel", "undo"
  */
 export async function updateBookingStatus(
