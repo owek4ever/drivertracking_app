@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MileageDisplay from '../components/MileageDisplay';
+import EmergencyContacts from '../components/EmergencyContacts';
 import { useDashboard } from '../hooks/useDashboard';
 import { Booking } from '../types';
 
@@ -187,6 +188,13 @@ export default function HomeScreen() {
             </>
           )}
         </View>
+
+        {/* Emergency Contacts */}
+        <EmergencyContacts
+          dispatchPhone="1234567890"
+          customerPhone={activeBooking?.customer?.phone || pendingBookings[0]?.customer?.phone}
+          managerPhone="0987654321"
+        />
 
         {/* Mileage Display */}
         <MileageDisplay mileage={null} />
