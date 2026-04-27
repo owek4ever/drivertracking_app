@@ -32,21 +32,21 @@ Plans:
 
 **Note**: "Shifts" do not exist in this app. Only "bookings" (missions).
 
-### Phase 2: Delivery Jobs
-**Goal**: Drivers view assigned deliveries and update delivery status
+### Phase 2: Authentication + API Wiring
+**Goal**: Drivers can log in and app works with live data from backend
 **Depends on**: Phase 1
 **Requirements**: JOB-01, JOB-02, JOB-03, JOB-04, JOB-05
 **Success Criteria** (what must be TRUE):
-  1. Driver can view list of assigned deliveries
-  2. Driver can tap a job to see full details (address, customer, time)
-  3. Driver can update job status (pending → in progress → completed)
-  4. Driver can view customer contact information
-  5. Driver can view completed job history
+  1. Driver can log in with server URL, username, password
+  2. Driver receives DOLAPIKEY token stored in secure storage
+  3. All screens fetch real data from backend API
+  4. Session expires triggers re-login prompt
+  5. Pull-to-refresh works on all list screens
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Build job list and job detail screens
-- [ ] 02-02: Implement job status updates and history view
+- [x] 02-01: Login screen + auth token flow
+- [x] 02-02: Wire screens to API, handle 401 globally
 
 ### Phase 3: UI Polish
 **Goal**: Enhanced driver experience with quick actions and theming
@@ -88,7 +88,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Booking Management | 3/3 | Complete | 2026-04-27 |
-| 2. Delivery Jobs | 0/2 | Not started | - |
+| 2. Auth + API Wiring | 1/2 | Executing | 2026-04-27 |
 | 3. UI Polish | 0/2 | Not started | - |
 | 4. Profile | 0/1 | Not started | - |
 
