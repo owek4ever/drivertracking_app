@@ -1,41 +1,39 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import HistoryCard from '../components/HistoryCard';
+import { useBookings } from '../hooks/useBookings';
 import { Booking } from '../types';
 
 type FilterType = 'all' | 'done' | 'cancelled';
 
-interface HistoryScreenProps {
-  historyData?: Booking[];
-  isLoading?: boolean;
-  onRefresh?: () => void;
-  onBookingPress?: (booking: Booking) => void;
-}
-
-export default function HistoryScreen({
-  historyData = [],
-  isLoading = false,
-  onRefresh,
-  onBookingPress,
-}: HistoryScreenProps) {
+export default function HistoryScreen() {
   const [filter, setFilter] = useState<FilterType>('all');
 
-  const filteredBookings = historyData.filter((booking) => {
+  const {
+    bookings,
+    loading,
+    error,
+    refetch,
+    isAuthenticated,
+  } = useBookings(undefined, { includeHistory: true, historyFilter: filter });
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
+
+  const filteredBookings = bookings.filter((booking) => {
     if (filter === 'all') return true;
     return booking.status === filter;
   });
 
-  const handleRefresh = useCallback(() => {
-    if (onRefresh) {
-      onRefresh();
-    }
-  }, [onRefresh]);
-
   const handleBookingPress = useCallback((booking: Booking) => {
-    if (onBookingPress) {
-      onBookingPress(booking);
-    }
-  }, [onBookingPress]);
+    // Navigate to booking detail - handled by parent navigator
+  }, []);
 
   const renderFilterButton = (type: FilterType, label: string) => (
     <TouchableOpacity
@@ -62,6 +60,17 @@ export default function HistoryScreen({
     <HistoryCard booking={item} onPress={() => handleBookingPress(item)} />
   );
 
+  if (loading && bookings.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading history...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.filterContainer}>
@@ -77,7 +86,7 @@ export default function HistoryScreen({
         contentContainerStyle={filteredBookings.length === 0 ? styles.emptyList : styles.list}
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={refreshing}
             onRefresh={handleRefresh}
             tintColor="#007AFF"
           />
@@ -91,6 +100,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F7',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#8E8E93',
   },
   filterContainer: {
     flexDirection: 'row',

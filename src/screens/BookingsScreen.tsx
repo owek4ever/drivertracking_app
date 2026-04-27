@@ -15,7 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { getBookings } from '../services/api';
+import { useBookings } from '../hooks/useBookings';
 import { Booking, BookingStatus } from '../types';
 
 type TabType = 'pending' | 'in_progress';
@@ -23,46 +23,27 @@ type TabType = 'pending' | 'in_progress';
 export default function BookingsScreen() {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<TabType>('pending');
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // Determine status based on active tab
+  const status = activeTab === 'pending' ? 'confirmed' : 'in_progress';
+
+  const {
+    bookings,
+    loading,
+    error,
+    refetch,
+  } = useBookings(status);
+
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchBookings = useCallback(async () => {
-    try {
-      const status = activeTab === 'pending' ? 'confirmed' : 'in_progress';
-      const response = await getBookings(status);
-      
-      if (response.success && response.data) {
-        setBookings(response.data);
-      } else {
-        setBookings([]);
-      }
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      setBookings([]);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [activeTab]);
-
-  // Fetch on mount and tab change
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      fetchBookings();
-    }, [fetchBookings])
-  );
-
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchBookings();
-  };
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    setLoading(true);
-    setBookings([]);
   };
 
   const handleBookingPress = (bookingId: number) => {

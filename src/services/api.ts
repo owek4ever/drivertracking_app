@@ -7,7 +7,9 @@
 
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 import { ApiResponse, DashboardData, Booking, MileageRecord } from '../types';
+import { navigate } from '@react-navigation/native';
 
 // Storage keys
 const AUTH_TOKEN_KEY = 'auth_token';
@@ -99,6 +101,40 @@ export async function clearAllAuth(): Promise<void> {
 }
 
 /**
+ * Handle session expiration (401 response)
+ * Clears token and prompts user to re-login
+ */
+export async function handleSessionExpired(): Promise<void> {
+  await clearAllAuth();
+  Alert.alert(
+    'Session Expired',
+    'Your session has expired. Please log in again.',
+    [
+      {
+        text: 'OK',
+        onPress: () => {
+          try {
+            navigate('Login' as never);
+          } catch (e) {
+            console.error('Navigation to Login failed:', e);
+          }
+        },
+      },
+    ]
+  );
+}
+
+/**
+ * Handle network error
+ */
+export function handleNetworkError(error?: string): void {
+  Alert.alert(
+    'Connection Error',
+    error || 'Cannot connect to server. Check your connection.'
+  );
+}
+
+/**
  * API Error class
  */
 export class ApiError extends Error {
@@ -139,27 +175,36 @@ async function apiRequest<T>(
       ...options,
       headers,
     });
-    
+
+    // Handle 401 Unauthorized - session expired
+    if (response.status === 401) {
+      await handleSessionExpired();
+      return {
+        success: false,
+        error: 'Session expired',
+      };
+    }
+
     const contentType = response.headers.get('content-type');
     let data: unknown;
-    
+
     if (contentType && contentType.includes('application/json')) {
       data = await response.json();
     } else {
       data = await response.text();
     }
-    
+
     if (!response.ok) {
-      const errorMessage = typeof data === 'object' && data !== null 
+      const errorMessage = typeof data === 'object' && data !== null
         ? (data as Record<string, unknown>).message as string || 'Request failed'
         : 'Request failed';
-      
+
       return {
         success: false,
         error: errorMessage,
       };
     }
-    
+
     return {
       success: true,
       data: data as T,
@@ -167,7 +212,8 @@ async function apiRequest<T>(
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Network error';
     console.error('API request error:', message);
-    
+    handleNetworkError(message);
+
     return {
       success: false,
       error: message,
@@ -237,6 +283,7 @@ export async function getDashboard(): Promise<ApiResponse<DashboardData>> {
     });
     
     if (response.status === 401) {
+      await handleSessionExpired();
       return {
         success: false,
         error: 'Session expired',
@@ -294,16 +341,24 @@ export async function getBookings(status?: string): Promise<ApiResponse<Booking[
         'Content-Type': 'application/json',
       },
     });
-    
+
+    if (response.status === 401) {
+      await handleSessionExpired();
+      return {
+        success: false,
+        error: 'Session expired',
+      };
+    }
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       return {
         success: false,
         error: data.error || 'Failed to fetch bookings',
       };
     }
-    
+
     return {
       success: true,
       data: Array.isArray(data) ? data : [],
@@ -311,6 +366,7 @@ export async function getBookings(status?: string): Promise<ApiResponse<Booking[
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Network error';
     console.error('getBookings error:', message);
+    handleNetworkError(message);
     return {
       success: false,
       error: message,
@@ -540,18 +596,26 @@ export async function getHistory(
         'Content-Type': 'application/json',
       },
     });
-    
+
+    if (response.status === 401) {
+      await handleSessionExpired();
+      return {
+        success: false,
+        error: 'Session expired',
+      };
+    }
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       return {
         success: false,
         error: data.error || 'Failed to fetch history',
       };
     }
-    
+
     let bookings: Booking[] = Array.isArray(data) ? data : [];
-    
+
     if (filter === 'all') {
       bookings = bookings.filter(
         (b: Booking) => b.status === 'done' || b.status === 'cancelled'
@@ -561,7 +625,7 @@ export async function getHistory(
     } else if (filter === 'cancelled') {
       bookings = bookings.filter((b: Booking) => b.status === 'cancelled');
     }
-    
+
     return {
       success: true,
       data: bookings,
@@ -569,6 +633,7 @@ export async function getHistory(
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Network error';
     console.error('getHistory error:', message);
+    handleNetworkError(message);
     return {
       success: false,
       error: message,
@@ -583,6 +648,8 @@ export default {
   setAuthToken,
   clearAuthToken,
   clearAllAuth,
+  handleSessionExpired,
+  handleNetworkError,
   apiGet,
   apiPost,
   apiPut,
