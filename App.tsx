@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // Import screens
 import LoginScreen from './src/screens/LoginScreen';
 import AppNavigator from './src/navigation/AppNavigator';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 // Auth functions
 import { isAuthenticated, logout } from './src/services/auth';
@@ -67,7 +68,9 @@ export default function App() {
   if (authState === 'unauthenticated') {
     return (
       <SafeAreaProvider>
-        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+        <ThemeProvider>
+          <LoginScreen onLoginSuccess={handleLoginSuccess} />
+        </ThemeProvider>
       </SafeAreaProvider>
     );
   }
@@ -75,7 +78,9 @@ export default function App() {
   // Authenticated - show main app with navigator
   return (
     <SafeAreaProvider>
-      <AppNavigator />
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,9 +1,10 @@
 /**
  * Home Screen
- * Displays driver info, vehicle info, active booking, and mileage
+ * Displays driver info, vehicle status, task schedule, active booking, and mileage
+ * Uber-style design: black/white high contrast, pill buttons, whisper shadows
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,12 +14,14 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MileageDisplay from '../components/MileageDisplay';
 import EmergencyContacts from '../components/EmergencyContacts';
+import VehicleStatusBars from '../components/VehicleStatusBars';
+import TaskSchedule from '../components/TaskSchedule';
 import { useDashboard } from '../hooks/useDashboard';
+import { useTheme } from '../context/ThemeContext';
 import { Booking } from '../types';
 
 interface HomeScreenProps {
@@ -27,11 +30,13 @@ interface HomeScreenProps {
 
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
+  const { theme, isDark, toggleTheme } = useTheme();
   const {
     driverInfo,
     vehicleInfo,
     activeBooking,
     pendingBookings,
+    mileage,
     loading,
     error,
     isAuthenticated,
@@ -39,6 +44,32 @@ export default function HomeScreen() {
   } = useDashboard();
 
   const [refreshing, setRefreshing] = useState(false);
+
+  // Theme colors
+  const colors = {
+    background: isDark ? '#000000' : '#F2F2F7',
+    card: isDark ? '#1C1C1E' : '#FFFFFF',
+    text: isDark ? '#FFFFFF' : '#000000',
+    textSecondary: isDark ? '#8E8E93' : '#8E8E93',
+    border: isDark ? '#38383A' : '#E5E5EA',
+    accent: '#000000',
+    accentText: '#FFFFFF',
+  };
+
+  useEffect(() => {
+    // Set up header with theme toggle
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.themeToggle}
+          onPress={toggleTheme}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.themeToggleText}>{isDark ? '☀️' : '🌙'}</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, toggleTheme, isDark]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -69,10 +100,10 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading...</Text>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -80,17 +111,17 @@ export default function HomeScreen() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Session expired</Text>
-          <Text style={styles.errorHint}>Please log in again</Text>
+          <Text style={[styles.errorText, { color: '#FF3B30' }]}>Session expired</Text>
+          <Text style={[styles.errorHint, { color: colors.textSecondary }]}>Please log in again</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -98,17 +129,17 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#007AFF']}
-            tintColor="#007AFF"
+            colors={[colors.accent]}
+            tintColor={colors.accent}
           />
         }
       >
-        {/* Welcome Card */}
-        <View style={styles.welcomeCard}>
-          <Text style={styles.welcomeText}>
+        {/* Welcome Card - Uber Black */}
+        <View style={[styles.welcomeCard, { backgroundColor: colors.accent }]}>
+          <Text style={[styles.welcomeText, { color: colors.accentText }]}>
             Welcome, {driverInfo ? `${driverInfo.firstname}` : 'Driver'}
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.accentText }]}>
             {activeBooking ? 'You have an active booking' : 'Ready to start your day'}
           </Text>
         </View>
@@ -116,32 +147,32 @@ export default function HomeScreen() {
         {/* Active Booking Card */}
         {activeBooking ? (
           <TouchableOpacity
-            style={styles.statusCard}
+            style={[styles.statusCard, { backgroundColor: colors.card }]}
             onPress={() => handleNavigateToBookingDetail(activeBooking.id)}
             activeOpacity={0.7}
           >
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Active Booking</Text>
+              <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>Active Booking</Text>
               <View style={styles.inProgressBadge}>
                 <Text style={styles.inProgressText}>In Progress</Text>
               </View>
             </View>
-            <Text style={styles.bookingRef}>{activeBooking.ref}</Text>
+            <Text style={[styles.bookingRef, { color: colors.text }]}>{activeBooking.ref}</Text>
             <View style={styles.routeInfo}>
               <View style={styles.routePoint}>
-                <Text style={styles.routeLabel}>From:</Text>
-                <Text style={styles.routeAddress} numberOfLines={1}>
+                <Text style={[styles.routeLabel, { color: colors.textSecondary }]}>From:</Text>
+                <Text style={[styles.routeAddress, { color: colors.text }]} numberOfLines={1}>
                   {activeBooking.departure_address}
                 </Text>
               </View>
               <View style={styles.routePoint}>
-                <Text style={styles.routeLabel}>To:</Text>
-                <Text style={styles.routeAddress} numberOfLines={1}>
+                <Text style={[styles.routeLabel, { color: colors.textSecondary }]}>To:</Text>
+                <Text style={[styles.routeAddress, { color: colors.text }]} numberOfLines={1}>
                   {activeBooking.arriving_address}
                 </Text>
               </View>
             </View>
-            <View style={styles.bookingFooter}>
+            <View style={[styles.bookingFooter, { borderTopColor: colors.border }]}>
               <Text style={styles.tripDistance}>
                 {activeBooking.distance ? `${activeBooking.distance} km` : '--'}
               </Text>
@@ -150,21 +181,21 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={styles.statusCard}
+            style={[styles.statusCard, { backgroundColor: colors.card }]}
             onPress={handleNavigateToBookings}
             activeOpacity={0.7}
           >
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Current Status</Text>
+              <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>Current Status</Text>
             </View>
-            <Text style={styles.statusText}>No active booking</Text>
-            <Text style={styles.statusHint}>
+            <Text style={[styles.statusText, { color: colors.text }]}>No active booking</Text>
+            <Text style={[styles.statusHint, { color: colors.textSecondary }]}>
               {pendingBookings.length > 0
                 ? `You have ${pendingBookings.length} pending booking${pendingBookings.length > 1 ? 's' : ''}`
                 : 'Go to Bookings to start a new mission'}
             </Text>
             {pendingBookings.length > 0 && (
-              <View style={styles.startPrompt}>
+              <View style={[styles.startPrompt, { borderTopColor: colors.border }]}>
                 <Text style={styles.startPromptText}>Tap to view pending bookings</Text>
               </View>
             )}
@@ -172,22 +203,35 @@ export default function HomeScreen() {
         )}
 
         {/* Vehicle Card */}
-        <View style={styles.vehicleCard}>
-          <Text style={styles.cardTitle}>Vehicle</Text>
+        <View style={[styles.vehicleCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>Vehicle</Text>
           {vehicleInfo ? (
             <>
-              <Text style={styles.vehicleText}>
+              <Text style={[styles.vehicleText, { color: colors.text }]}>
                 {vehicleInfo.maker} {vehicleInfo.model}
               </Text>
-              <Text style={styles.vehiclePlate}>{vehicleInfo.license_plate}</Text>
+              <Text style={[styles.vehiclePlate, { color: colors.textSecondary }]}>
+                {vehicleInfo.license_plate}
+              </Text>
             </>
           ) : (
             <>
-              <Text style={styles.vehicleText}>Not assigned</Text>
-              <Text style={styles.vehicleHint}>Contact dispatch for vehicle assignment</Text>
+              <Text style={[styles.vehicleText, { color: colors.text }]}>Not assigned</Text>
+              <Text style={[styles.vehicleHint, { color: colors.textSecondary }]}>
+                Contact dispatch for vehicle assignment
+              </Text>
             </>
           )}
         </View>
+
+        {/* Vehicle Status Bars - Mileage + Fuel */}
+        <VehicleStatusBars mileage={mileage} vehicleInfo={vehicleInfo} />
+
+        {/* Task Schedule - Upcoming Bookings */}
+        <TaskSchedule
+          bookings={pendingBookings}
+          onBookingPress={handleNavigateToBookingDetail}
+        />
 
         {/* Emergency Contacts */}
         <EmergencyContacts
@@ -196,8 +240,8 @@ export default function HomeScreen() {
           managerPhone="0987654321"
         />
 
-        {/* Mileage Display */}
-        <MileageDisplay mileage={null} />
+        {/* Mileage Display (Legacy) */}
+        <MileageDisplay mileage={mileage} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -206,7 +250,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   scrollView: {
     flex: 1,
@@ -222,7 +265,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8E8E93',
   },
   errorContainer: {
     flex: 1,
@@ -233,15 +275,21 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FF3B30',
     marginBottom: 4,
   },
   errorHint: {
     fontSize: 14,
-    color: '#8E8E93',
+  },
+  themeToggle: {
+    marginRight: 16,
+    padding: 8,
+    borderRadius: 999,
+    backgroundColor: '#EFEFEF',
+  },
+  themeToggleText: {
+    fontSize: 20,
   },
   welcomeCard: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
@@ -249,19 +297,21 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   subtitle: {
     fontSize: 14,
-    color: '#FFFFFF',
     opacity: 0.8,
     marginTop: 4,
   },
   statusCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -272,13 +322,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#8E8E93',
   },
   inProgressBadge: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000000',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 999,
   },
   inProgressText: {
     fontSize: 12,
@@ -288,28 +337,24 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
   },
   statusHint: {
     fontSize: 14,
-    color: '#8E8E93',
     marginTop: 4,
   },
   startPrompt: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
   },
   startPromptText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000000',
   },
   bookingRef: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000000',
     marginBottom: 12,
   },
   routeInfo: {
@@ -320,12 +365,10 @@ const styles = StyleSheet.create({
   },
   routeLabel: {
     fontSize: 12,
-    color: '#8E8E93',
     marginBottom: 2,
   },
   routeAddress: {
     fontSize: 14,
-    color: '#000000',
   },
   bookingFooter: {
     flexDirection: 'row',
@@ -333,37 +376,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
   },
   tripDistance: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000000',
   },
   viewDetails: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#000000',
+    fontWeight: '500',
   },
   vehicleCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   vehicleText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
     marginTop: 4,
   },
   vehiclePlate: {
     fontSize: 14,
-    color: '#8E8E93',
     marginTop: 2,
   },
   vehicleHint: {
     fontSize: 14,
-    color: '#8E8E93',
     marginTop: 4,
   },
 });

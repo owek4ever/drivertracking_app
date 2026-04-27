@@ -55,6 +55,7 @@ export interface Vehicle {
   initial_mileage: number | null;
   horsepower?: number;
   in_service: boolean;
+  fuel_percentage?: number;
 }
 
 // Customer interface - client/customer
@@ -64,6 +65,29 @@ export interface Customer {
   lastname: string;
   phone: string;
   company_name: string | null;
+}
+
+// Booking interface - represents a transport mission/booking
+export interface Booking {
+  id: number;
+  ref: string;
+  status: BookingStatus;
+  fk_driver: number | null;
+  fk_vehicle: number | null;
+  fk_customer: number | null;
+  customer?: Customer;
+  departure_address: string;
+  arriving_address: string;
+  pickup_datetime: string | null;
+  scheduled_date?: string;
+  dropoff_datetime: string | null;
+  distance: string | null; // Distance in kilometers
+  eta: string | null;
+  // Optional coordinates
+  departure_lat?: number;
+  departure_lon?: number;
+  arriving_lat?: number;
+  arriving_lon?: number;
 }
 
 // Mileage record interface - from llx_flotte_inspection
