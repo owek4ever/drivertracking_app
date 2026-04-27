@@ -1,97 +1,95 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, StyleSheet } from 'react-native';
+/**
+ * Root App Component
+ * Handles auth routing: LoginScreen vs Tab Navigator
+ */
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Placeholder screens
-function HomeScreen() {
-  return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Dashboard</Text>
-      <Text>Driver: Loading...</Text>
-      <Text>Active Booking: None</Text>
-    </View>
-  );
-}
+// Import screens
+import LoginScreen from './src/screens/LoginScreen';
+import AppNavigator from './src/navigation/AppNavigator';
 
-function BookingsScreen() {
-  return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Bookings</Text>
-      <Text>Active & pending bookings will appear here</Text>
-    </View>
-  );
-}
+// Auth functions
+import { isAuthenticated, logout } from './src/services/auth';
 
-function HistoryScreen() {
-  return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>History</Text>
-      <Text>Completed & cancelled bookings</Text>
-    </View>
-  );
-}
-
-function ProfileScreen() {
-  return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Profile</Text>
-      <Text>Driver information</Text>
-    </View>
-  );
-}
-
-const Tab = createBottomTabNavigator();
+type AuthState = 'checking' | 'authenticated' | 'unauthenticated';
 
 export default function App() {
+  const [authState, setAuthState] = useState<AuthState>('checking');
+  const [loginSuccessTrigger, setLoginSuccessTrigger] = useState(0);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const authenticated = await isAuthenticated();
+      setAuthState(authenticated ? 'authenticated' : 'unauthenticated');
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setAuthState('unauthenticated');
+    }
+  }, []);
+
+  // Check auth on mount
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // Handle successful login
+  const handleLoginSuccess = useCallback(() => {
+    setAuthState('authenticated');
+    setLoginSuccessTrigger(prev => prev + 1);
+  }, []);
+
+  // Handle logout
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout();
+      setAuthState('unauthenticated');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }, []);
+
+  // Loading state
+  if (authState === 'checking') {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  // Not authenticated - show login screen
+  if (authState === 'unauthenticated') {
+    return (
+      <SafeAreaProvider>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+      </SafeAreaProvider>
+    );
+  }
+
+  // Authenticated - show main app with navigator
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={{
-            tabBarActiveTintColor: '#007AFF',
-            tabBarInactiveTintColor: '#8E8E93',
-            headerShown: true,
-          }}
-        >
-          <Tab.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ title: 'Home' }}
-          />
-          <Tab.Screen
-            name="Bookings"
-            component={BookingsScreen}
-            options={{ title: 'Bookings' }}
-          />
-          <Tab.Screen
-            name="History"
-            component={HistoryScreen}
-            options={{ title: 'History' }}
-          />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileScreen}
-            options={{ title: 'Profile' }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
+      <AppNavigator />
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: '#F2F2F7',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#8E8E93',
   },
 });
