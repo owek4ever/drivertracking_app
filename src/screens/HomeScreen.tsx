@@ -1,7 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import MileageDisplay from '../components/MileageDisplay';
+import { MileageRecord } from '../types';
 
-export default function HomeScreen() {
+interface HomeScreenProps {
+  mileageData?: MileageRecord | null;
+  activeBookingDistance?: string | null;
+}
+
+export default function HomeScreen({ mileageData, activeBookingDistance }: HomeScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -12,8 +19,17 @@ export default function HomeScreen() {
 
         <View style={styles.statusCard}>
           <Text style={styles.cardTitle}>Current Status</Text>
-          <Text style={styles.statusText}>No active booking</Text>
-          <Text style={styles.statusHint}>Go to Bookings to start a new mission</Text>
+          {activeBookingDistance ? (
+            <>
+              <Text style={styles.statusText}>Active Booking</Text>
+              <Text style={styles.tripDistance}>Trip: {activeBookingDistance} mi</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.statusText}>No active booking</Text>
+              <Text style={styles.statusHint}>Go to Bookings to start a new mission</Text>
+            </>
+          )}
         </View>
 
         <View style={styles.vehicleCard}>
@@ -22,11 +38,7 @@ export default function HomeScreen() {
           <Text style={styles.vehicleHint}>Contact dispatch for vehicle assignment</Text>
         </View>
 
-        <View style={styles.mileageCard}>
-          <Text style={styles.cardTitle}>Mileage</Text>
-          <Text style={styles.mileageText}>-- km</Text>
-          <Text style={styles.mileageHint}>Start a booking to track distance</Text>
-        </View>
+        <MileageDisplay mileage={mileageData || null} />
       </View>
     </SafeAreaView>
   );
@@ -80,6 +92,12 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     marginTop: 4,
   },
+  tripDistance: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#007AFF',
+    marginTop: 4,
+  },
   vehicleCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -92,22 +110,6 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   vehicleHint: {
-    fontSize: 14,
-    color: '#8E8E93',
-    marginTop: 4,
-  },
-  mileageCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  mileageText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
-  },
-  mileageHint: {
     fontSize: 14,
     color: '#8E8E93',
     marginTop: 4,

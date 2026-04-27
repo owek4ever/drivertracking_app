@@ -1,29 +1,41 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
-
-interface HistoryBooking {
-  id: number;
-  ref: string;
-  status: string;
-  departure_address: string;
-  arriving_address: string;
-  pickup_datetime: string;
-  dropoff_datetime: string;
-  distance: string;
-}
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import HistoryCard from '../components/HistoryCard';
+import { Booking } from '../types';
 
 type FilterType = 'all' | 'done' | 'cancelled';
 
-export default function HistoryScreen() {
+interface HistoryScreenProps {
+  historyData?: Booking[];
+  isLoading?: boolean;
+  onRefresh?: () => void;
+  onBookingPress?: (booking: Booking) => void;
+}
+
+export default function HistoryScreen({
+  historyData = [],
+  isLoading = false,
+  onRefresh,
+  onBookingPress,
+}: HistoryScreenProps) {
   const [filter, setFilter] = useState<FilterType>('all');
 
-  // Placeholder data - will be replaced with API data
-  const allBookings: HistoryBooking[] = [];
-
-  const filteredBookings = allBookings.filter((booking) => {
+  const filteredBookings = historyData.filter((booking) => {
     if (filter === 'all') return true;
     return booking.status === filter;
   });
+
+  const handleRefresh = useCallback(() => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  }, [onRefresh]);
+
+  const handleBookingPress = useCallback((booking: Booking) => {
+    if (onBookingPress) {
+      onBookingPress(booking);
+    }
+  }, [onBookingPress]);
 
   const renderFilterButton = (type: FilterType, label: string) => (
     <TouchableOpacity
@@ -46,33 +58,8 @@ export default function HistoryScreen() {
     </View>
   );
 
-  const renderBookingItem = ({ item }: { item: HistoryBooking }) => (
-    <View style={styles.bookingCard}>
-      <View style={styles.bookingHeader}>
-        <Text style={styles.bookingRef}>{item.ref}</Text>
-        <View style={[styles.statusBadge, item.status === 'done' ? styles.status_done : styles.status_cancelled]}>
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </View>
-      <View style={styles.bookingDetails}>
-        <Text style={styles.label}>From:</Text>
-        <Text style={styles.value}>{item.departure_address}</Text>
-      </View>
-      <View style={styles.bookingDetails}>
-        <Text style={styles.label}>To:</Text>
-        <Text style={styles.value}>{item.arriving_address}</Text>
-      </View>
-      <View style={styles.bookingFooter}>
-        <Text style={styles.dateTime}>
-          {item.dropoff_datetime
-            ? `Completed: ${new Date(item.dropoff_datetime).toLocaleDateString()}`
-            : item.pickup_datetime
-            ? `Pickup: ${new Date(item.pickup_datetime).toLocaleDateString()}`
-            : '--'}
-        </Text>
-        <Text style={styles.distance}>{item.distance || '--'} km</Text>
-      </View>
-    </View>
+  const renderBookingItem = ({ item }: { item: Booking }) => (
+    <HistoryCard booking={item} onPress={() => handleBookingPress(item)} />
   );
 
   return (
@@ -88,6 +75,13 @@ export default function HistoryScreen() {
         renderItem={renderBookingItem}
         ListEmptyComponent={renderEmptyState}
         contentContainerStyle={filteredBookings.length === 0 ? styles.emptyList : styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={handleRefresh}
+            tintColor="#007AFF"
+          />
+        }
       />
     </SafeAreaView>
   );
@@ -149,67 +143,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#8E8E93',
     textAlign: 'center',
-  },
-  bookingCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  bookingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  bookingRef: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  status_done: {
-    backgroundColor: '#8E8E93',
-  },
-  status_cancelled: {
-    backgroundColor: '#FF3B30',
-  },
-  bookingDetails: {
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginBottom: 2,
-  },
-  value: {
-    fontSize: 14,
-    color: '#000000',
-  },
-  bookingFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5EA',
-  },
-  dateTime: {
-    fontSize: 14,
-    color: '#8E8E93',
-  },
-  distance: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#007AFF',
   },
 });
