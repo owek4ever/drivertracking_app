@@ -2,30 +2,27 @@
 
 ## Overview
 
-A mobile app for delivery drivers to track shifts, mileage, and deliver jobs with photo verification. Four phases deliver a complete driver workflow: shift/mileage logging → job management → photo proof → notifications.
+A mobile app for delivery drivers to manage bookings (missions) with real-time status tracking, mileage display, and driver profile. Four phases deliver a complete driver workflow: booking management → UI polish → profile.
 
 ## Phases
 
-- [ ] **Phase 1: Shift & Mileage Tracking** - Drivers log work time and miles
-- [ ] **Phase 2: Delivery Jobs** - Drivers view and update assigned deliveries
-- [ ] **Phase 3: Photo Proof** - Drivers capture delivery verification photos
-- [ ] **Phase 4: Notifications** - Drivers receive push alerts for jobs
+- [x] **Phase 1: Booking Management** - Drivers manage bookings/missions
+- [ ] **Phase 2: Delivery Jobs** (same as original) - Drivers view and update deliveries
+- [ ] **Phase 3: UI Polish** - Emergency contacts, vehicle status, themes
+- [ ] **Phase 4: Profile** - Driver profile editing, photo upload, language
 
 ## Phase Details
 
-### Phase 1: Shift & Mileage Tracking
-**Goal**: Drivers can log work shifts and track mileage driven
+### Phase 1: Booking Management
+**Goal**: Drivers can view and manage assigned bookings/missions
 **Depends on**: Nothing (first phase)
-**Requirements**: SHIFT-01, SHIFT-02, SHIFT-03, SHIFT-04, MILE-01, MILE-02, MILE-03, MILE-04
+**Requirements**: SHIFT-01, SHIFT-02, SHIFT-04, MILE-04 (mapped to booking model)
 **Success Criteria** (what must be TRUE):
-  1. Driver can start a shift with automatic timestamp
-  2. Driver can end a shift with automatic timestamp
-  3. Driver can log breaks during active shift
-  4. Driver can view current shift duration in real-time
-  5. Driver can log start mileage at shift start
-  6. Driver can log end mileage at shift end
-  7. System calculates total miles driven automatically
-  8. Driver can view history of past shifts and mileage
+  1. Driver can start a booking from task schedule
+  2. Driver can end/complete a booking
+  3. Driver can view booking details (addresses, customer, distance)
+  4. Driver can view mileage from database (read-only)
+  5. Driver can view booking history
 **Plans**: 3 plans
 
 Plans:
@@ -33,8 +30,10 @@ Plans:
 - [x] 01-02: Implement booking management (start/complete/status)
 - [x] 01-03: Implement mileage display and history
 
+**Note**: "Shifts" do not exist in this app. Only "bookings" (missions).
+
 ### Phase 2: Delivery Jobs
-**Goal**: Drivers can view assigned jobs and update delivery status
+**Goal**: Drivers view assigned deliveries and update delivery status
 **Depends on**: Phase 1
 **Requirements**: JOB-01, JOB-02, JOB-03, JOB-04, JOB-05
 **Success Criteria** (what must be TRUE):
@@ -49,32 +48,37 @@ Plans:
 - [ ] 02-01: Build job list and job detail screens
 - [ ] 02-02: Implement job status updates and history view
 
-### Phase 3: Photo Proof
-**Goal**: Drivers can capture and store photo proof at delivery locations
+### Phase 3: UI Polish
+**Goal**: Enhanced driver experience with quick actions and theming
 **Depends on**: Phase 2
-**Requirements**: PHOTO-01, PHOTO-02, PHOTO-03, PHOTO-04
+**Requirements**: UI-01, UI-02, UI-03, UI-04
 **Success Criteria** (what must be TRUE):
-  1. Driver can capture photo using device camera
-  2. Captured photo includes timestamp metadata
-  3. Photo is saved locally and queued for backend upload
-  4. Driver can view previously captured proof photos
+  1. Driver has emergency contacts with one-tap calling (dispatch, customer, manager)
+  2. Vehicle status bars showing mileage and fuel levels
+  3. Task schedule displayed on HomeScreen
+  4. Driver can toggle dark/light theme
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Implement photo capture with camera
-- [ ] 03-02: Implement photo storage and gallery view
+- [ ] 03-01: Add emergency contacts with one-tap calling
+- [ ] 03-02: Add vehicle status bars, task schedule, theme toggle
 
-### Phase 4: Notifications
-**Goal**: Drivers receive push notifications for job updates
+**Note**: No camera/photo proof needed — Flotte module handles this natively.
+
+### Phase 4: Profile
+**Goal**: Driver profile management with customization
 **Depends on**: Phase 3
-**Requirements**: NOTIF-01, NOTIF-02
+**Requirements**: PROF-01, PROF-02, PROF-03
 **Success Criteria** (what must be TRUE):
-  1. Driver receives push notification when new job is assigned
-  2. Driver receives push notification when job details are updated
+  1. Driver can view and edit profile (name, phone, email)
+  2. Driver can upload profile photo
+  3. Driver can select language (EN/FR/AR) with RTL support
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Implement push notification integration with FCM
+- [ ] 04-01: Implement profile editing, photo upload, language selector
+
+**Note**: Notifications (FCM) are built into the Flotte module — not a separate phase.
 
 ## Progress
 
@@ -83,21 +87,23 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Shift & Mileage Tracking | 3/3 | Complete | 2026-04-27 |
+| 1. Booking Management | 3/3 | Complete | 2026-04-27 |
 | 2. Delivery Jobs | 0/2 | Not started | - |
-| 3. Photo Proof | 0/2 | Not started | - |
-| 4. Notifications | 0/1 | Not started | - |
+| 3. UI Polish | 0/2 | Not started | - |
+| 4. Profile | 0/1 | Not started | - |
 
 ## Coverage
 
 **Phase Mapping:**
-- Phase 1: 8 requirements (SHIFT-01 to SHIFT-04, MILE-01 to MILE-04)
+- Phase 1: 5 requirements (booking management)
 - Phase 2: 5 requirements (JOB-01 to JOB-05)
-- Phase 3: 4 requirements (PHOTO-01 to PHOTO-04)
-- Phase 4: 2 requirements (NOTIF-01 to NOTIF-02)
+- Phase 3: 4 requirements (UI-01 to UI-04)
+- Phase 4: 3 requirements (PROF-01 to PROF-03)
 
-**Coverage:** 19/19 requirements mapped ✓
+**Coverage:** 17/17 requirements mapped ✓
 
 ---
 
-*Roadmap created: 2026-04-27*
+*Roadmap corrected: 2026-04-27*
+*Removed: Photo Proof (Phase 3) — handled by Flotte module*
+*Removed: Notifications (Phase 4) — handled by Flotte module (FCM)*

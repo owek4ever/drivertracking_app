@@ -5,7 +5,7 @@
  */
 
 import * as SecureStore from 'expo-secure-store';
-import { apiGet, apiPost, setAuthToken, clearAuthToken, getAuthToken, ApiError } from './api';
+import { apiGet, apiPost, setAuthToken, clearAuthToken, getAuthToken, setServerUrl, clearAllAuth, ApiError } from './api';
 import { AuthTokenResponse, ApiResponse, Driver } from '../types';
 
 // Storage keys
@@ -17,6 +17,7 @@ const DRIVER_INFO_KEY = 'driver_info';
 export interface LoginCredentials {
   username: string;
   password: string;
+  serverUrl: string; // e.g., https://yourserver.com
 }
 
 /**
@@ -30,11 +31,18 @@ interface LoginResponse {
 }
 
 /**
- * Perform login with username and password
+ * Perform login with username, password, and server URL
  * POST to /custom/drivertracking/api/login
+ * 
+ * @param credentials - username, password, and server URL
  */
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   try {
+    // First, store the server URL (needed for all API calls)
+    await setServerUrl(credentials.serverUrl);
+    
+    // Now make the login request
+    // Note: Login may use DOLAPIKEY or basic auth depending on backend config
     const response = await apiPost<{ token: string; driver?: Driver }>('/api/login', {
       username: credentials.username,
       password: credentials.password,
@@ -75,8 +83,8 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
  */
 export async function logout(): Promise<void> {
   try {
-    // Clear auth token
-    await clearAuthToken();
+    // Clear all auth data (token + server URL)
+    await clearAllAuth();
     
     // Clear driver info
     await SecureStore.deleteItemAsync(DRIVER_INFO_KEY);

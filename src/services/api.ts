@@ -2,16 +2,56 @@
  * API Service Layer
  * Base API configuration and fetch wrapper
  * Uses /custom/drivertracking/ endpoints
+ * Uses DOLAPIKEY header for Dolibarr REST API authentication
  */
 
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ApiResponse, DashboardData, Booking, MileageRecord } from '../types';
-
-// API Base URL - from CONTEXT.md
-const API_BASE_URL = '/custom/drivertracking';
 
 // Storage keys
 const AUTH_TOKEN_KEY = 'auth_token';
+const SERVER_URL_KEY = 'server_url';
+
+/**
+ * Get the Dolibarr server URL
+ * Must be configured at login (e.g., https://yourserver.com)
+ */
+export async function getServerUrl(): Promise<string | null> {
+  try {
+    const url = await AsyncStorage.getItem(SERVER_URL_KEY);
+    return url;
+  } catch (error) {
+    console.error('Error getting server URL:', error);
+    return null;
+  }
+}
+
+/**
+ * Set the Dolibarr server URL
+ * Called after successful login
+ */
+export async function setServerUrl(url: string): Promise<void> {
+  try {
+    // Remove trailing slash if present
+    const cleanUrl = url.replace(/\/$/, '');
+    await AsyncStorage.setItem(SERVER_URL_KEY, cleanUrl);
+  } catch (error) {
+    console.error('Error setting server URL:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get the full API base URL (server + endpoint path)
+ */
+async function getApiBaseUrl(): Promise<string> {
+  const serverUrl = await getServerUrl();
+  if (!serverUrl) {
+    throw new Error('Server URL not configured. Please log in again.');
+  }
+  return `${serverUrl}/custom/drivertracking`;
+}
 
 /**
  * Get the stored authentication token
@@ -51,6 +91,14 @@ export async function clearAuthToken(): Promise<void> {
 }
 
 /**
+ * Clear all auth data (logout)
+ */
+export async function clearAllAuth(): Promise<void> {
+  await clearAuthToken();
+  await AsyncStorage.removeItem(SERVER_URL_KEY);
+}
+
+/**
  * API Error class
  */
 export class ApiError extends Error {
@@ -65,25 +113,25 @@ export class ApiError extends Error {
 }
 
 /**
- * Make an authenticated API request
+ * Make an authenticated API request using DOLAPIKEY
  */
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const baseUrl = await getApiBaseUrl();
+  const url = `${baseUrl}${endpoint}`;
   
-  // Get auth token
   const token = await getAuthToken();
   
-  // Build headers
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
   
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    // Dolibarr REST API uses DOLAPIKEY header, not Authorization: Bearer
+    headers['DOLAPIKEY'] = token;
   }
   
   try {
@@ -92,7 +140,6 @@ async function apiRequest<T>(
       headers,
     });
     
-    // Handle non-JSON responses
     const contentType = response.headers.get('content-type');
     let data: unknown;
     
@@ -179,10 +226,12 @@ export async function getDashboard(): Promise<ApiResponse<DashboardData>> {
       };
     }
     
-    const response = await fetch(`${API_BASE_URL}/api_driver.php`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/api_driver.php`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        // Dolibarr REST API uses DOLAPIKEY header
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
     });
@@ -237,10 +286,11 @@ export async function getBookings(status?: string): Promise<ApiResponse<Booking[
       endpoint += `?status=${status}`;
     }
     
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
     });
@@ -274,7 +324,6 @@ export async function getBookings(status?: string): Promise<ApiResponse<Booking[
  * Backend auto-captures timestamp - no manual time entry
  */
 export async function startBooking(bookingId: number): Promise<ApiResponse<{ success: boolean; message?: string }>> {
-  // Validate booking ID is numeric (T-01-04)
   if (!validateBookingId(bookingId)) {
     console.error('Invalid booking ID:', bookingId);
     return {
@@ -293,10 +342,11 @@ export async function startBooking(bookingId: number): Promise<ApiResponse<{ suc
       };
     }
     
-    const response = await fetch(`${API_BASE_URL}/ajax_start_booking.php`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/ajax_start_booking.php`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ booking_id: bookingId }),
@@ -334,7 +384,6 @@ export async function updateBookingStatus(
   bookingId: number,
   action: 'complete' | 'cancel' | 'undo'
 ): Promise<ApiResponse<{ success: boolean; message?: string }>> {
-  // Validate booking ID is numeric (T-01-04)
   if (!validateBookingId(bookingId)) {
     console.error('Invalid booking ID:', bookingId);
     return {
@@ -353,10 +402,11 @@ export async function updateBookingStatus(
       };
     }
     
-    const response = await fetch(`${API_BASE_URL}/ajax_update_booking.php`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/ajax_update_booking.php`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
@@ -420,10 +470,11 @@ export async function getMileage(vehicleId?: number): Promise<ApiResponse<Mileag
       endpoint += '?sortfield=date&sortorder=DESC&limit=1';
     }
     
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
     });
@@ -437,7 +488,6 @@ export async function getMileage(vehicleId?: number): Promise<ApiResponse<Mileag
       };
     }
     
-    // Return the most recent inspection record (first in sorted list)
     const inspections = Array.isArray(data) ? data : [];
     const latestRecord = inspections.length > 0 ? inspections[0] : null;
     
@@ -481,12 +531,12 @@ export async function getHistory(
     } else if (filter === 'cancelled') {
       endpoint += '&status=cancelled';
     }
-    // For 'all', get both done and cancelled (the API may not support comma-separated)
     
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const baseUrl = await getApiBaseUrl();
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'DOLAPIKEY': token,
         'Content-Type': 'application/json',
       },
     });
@@ -502,8 +552,6 @@ export async function getHistory(
     
     let bookings: Booking[] = Array.isArray(data) ? data : [];
     
-    // If filter is 'all', we need to get both done and cancelled separately
-    // For now, filter the results client-side
     if (filter === 'all') {
       bookings = bookings.filter(
         (b: Booking) => b.status === 'done' || b.status === 'cancelled'
@@ -529,9 +577,12 @@ export async function getHistory(
 }
 
 export default {
+  getServerUrl,
+  setServerUrl,
   getAuthToken,
   setAuthToken,
   clearAuthToken,
+  clearAllAuth,
   apiGet,
   apiPost,
   apiPut,
