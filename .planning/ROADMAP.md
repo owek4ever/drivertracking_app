@@ -60,8 +60,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Add emergency contacts with one-tap calling
-- [ ] 03-02: Add vehicle status bars, task schedule, theme toggle
+- [x] 03-01: Add emergency contacts with one-tap calling
+- [x] 03-02: Add vehicle status bars, task schedule, theme toggle
 
 **Note**: No camera/photo proof needed — Flotte module handles this natively.
 
@@ -89,7 +89,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Booking Management | 3/3 | Complete | 2026-04-27 |
 | 2. Auth + API Wiring | 2/2 | Complete | 2026-04-27 |
-| 3. UI Polish | 0/2 | Not started | - |
+| 3. UI Polish | 2/2 | Complete | 2026-04-27 |
 | 4. Profile | 0/1 | Not started | - |
 
 ## Coverage
