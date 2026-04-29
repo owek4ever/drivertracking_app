@@ -48,14 +48,30 @@ async function getDolibarrApiUrl(): Promise<string> {
  * @param credentials - username, password, and server URL
  */
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
+  console.log('=== LOGIN FUNCTION STARTED ===');
+  console.log('Server URL:', credentials.serverUrl);
+  console.log('Username:', credentials.username);
+  
   try {
     // First, store the server URL (needed for all API calls)
     await setServerUrl(credentials.serverUrl);
+    console.log('Server URL saved');
 
     // Dolibarr REST API login: /api/index.php/login
-    const baseUrl = await getDolibarrApiUrl();
-    const loginUrl = `${baseUrl}/login`;
+    let baseUrl: string;
+    try {
+      baseUrl = await getDolibarrApiUrl();
+      console.log('Base URL:', baseUrl);
+    } catch (urlError) {
+      console.error('Failed to get API base URL:', urlError);
+      return {
+        success: false,
+        error: `Failed to build API URL: ${urlError instanceof Error ? urlError.message : 'Unknown error'}`,
+      };
+    }
     
+    const loginUrl = `${baseUrl}/login`;
+
     // Dolibarr REST API expects credentials as query parameters, not JSON body
     const loginUrlWithParams = `${loginUrl}?login=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`;
     console.log('Attempting login to:', loginUrlWithParams);
