@@ -56,17 +56,16 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     const baseUrl = await getDolibarrApiUrl();
     const loginUrl = `${baseUrl}/login`;
     
-    console.log('Attempting login to:', loginUrl);
+    // Dolibarr REST API expects credentials as query parameters, not JSON body
+    const loginUrlWithParams = `${loginUrl}?login=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`;
+    console.log('Attempting login to:', loginUrlWithParams);
 
-    const response = await fetch(loginUrl, {
+    const response = await fetch(loginUrlWithParams, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        login: credentials.username,
-        password: credentials.password,
-      }),
+      // No body needed - credentials are in query params
     });
     
     console.log('Response status:', response.status);
@@ -74,25 +73,30 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     const contentType = response.headers.get('content-type');
     console.log('Response content-type:', contentType);
     
-    let data: { token?: string; error?: string; success?: boolean; message?: string } = {};
+    let data: { token?: string; error?: string; success?: boolean; message?: string; [key: string]: unknown } = {};
+    let responseText = '';
     
     try {
-      const responseText = await response.text();
-      console.log('Raw response:', responseText.substring(0, 1000));
+      responseText = await response.text();
+      console.log('Raw response text:', responseText);
+      console.log('Response length:', responseText.length);
       
       if (contentType && contentType.includes('application/json')) {
         data = JSON.parse(responseText);
-        console.log('Parsed data:', JSON.stringify(data, null, 2));
+        console.log('Parsed data keys:', Object.keys(data));
+        console.log('Full parsed data:', JSON.stringify(data, null, 2));
       } else {
         // If not JSON, server might be returning HTML error page
-        console.error('Server returned non-JSON response');
+        console.error('Server returned non-JSON response. Content-Type:', contentType);
+        console.error('Response text preview:', responseText.substring(0, 500));
         return {
           success: false,
           error: 'Server error: Check if REST API module is enabled and URL is correct',
         };
       }
     } catch (parseError) {
-      console.error('Failed to parse response:', parseError);
+      console.error('Failed to parse JSON response:', parseError);
+      console.error('Raw response that failed to parse:', responseText);
       return {
         success: false,
         error: 'Invalid server response. Check server URL configuration.',
