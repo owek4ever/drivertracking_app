@@ -113,16 +113,20 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
 
     // Handle various error response formats from Dolibarr
     // Dolibarr may return HTTP 200 with success: false and error message
+    const dataKeys = Object.keys(data);
     const errorMessage = data.error || data.message || 
       (data.success === false ? 'Login failed - check credentials' : null) ||
-      (Object.keys(data).length === 0 ? 'Empty response from server' : null) ||
-      `Login failed (HTTP ${response.status})`;
+      (dataKeys.length === 0 ? 'Empty response from server' : null);
     
-    console.log('Login error details:', errorMessage, 'Response data:', data);
+    // Build detailed error message for debugging
+    const detailedError = errorMessage || `Login failed (HTTP ${response.status})`;
+    const debugInfo = `\n\nDebug info:\nKeys: ${dataKeys.join(', ') || 'none'}\nData: ${JSON.stringify(data).substring(0, 200)}`;
+    
+    console.log('Login error details:', detailedError, 'Response data:', data);
     
     return {
       success: false,
-      error: errorMessage,
+      error: detailedError + debugInfo,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
