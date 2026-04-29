@@ -80,26 +80,28 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       responseText = await response.text();
       console.log('Raw response text:', responseText);
       console.log('Response length:', responseText.length);
+      console.log('Content-Type header:', contentType);
       
-      if (contentType && contentType.includes('application/json')) {
+      // Try to parse as JSON regardless of Content-Type header
+      // Some servers return JSON with wrong content-type
+      try {
         data = JSON.parse(responseText);
         console.log('Parsed data keys:', Object.keys(data));
         console.log('Full parsed data:', JSON.stringify(data, null, 2));
-      } else {
-        // If not JSON, server might be returning HTML error page
-        console.error('Server returned non-JSON response. Content-Type:', contentType);
+      } catch (parseError) {
+        // Not valid JSON
+        console.error('Response is not valid JSON. Content-Type:', contentType);
         console.error('Response text preview:', responseText.substring(0, 500));
         return {
           success: false,
           error: 'Server error: Check if REST API module is enabled and URL is correct',
         };
       }
-    } catch (parseError) {
-      console.error('Failed to parse JSON response:', parseError);
-      console.error('Raw response that failed to parse:', responseText);
+    } catch (error) {
+      console.error('Failed to read response:', error);
       return {
         success: false,
-        error: 'Invalid server response. Check server URL configuration.',
+        error: 'Failed to read server response. Check server URL configuration.',
       };
     }
 
