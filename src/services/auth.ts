@@ -105,9 +105,20 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
         console.log('Parsed data keys:', Object.keys(data));
         console.log('Full parsed data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
-        // Not valid JSON
+        // Not valid JSON - could be CORS error or HTML error page
         console.error('Response is not valid JSON. Content-Type:', contentType);
-        console.error('Response text preview:', responseText.substring(0, 500));
+        console.error('Response text preview:', responseText.substring(0, 300));
+        console.error('Response first 100 chars:', responseText.substring(0, 100));
+        
+        // Check if it looks like HTML
+        const isHtml = responseText.trim().toLowerCase().startsWith('<');
+        if (isHtml) {
+          return {
+            success: false,
+            error: 'CORS or network error: Cannot connect to server from mobile app. Response is HTML, not JSON.\n\nTry using https:// or check if server allows CORS requests.',
+          };
+        }
+        
         return {
           success: false,
           error: 'Server error: Check if REST API module is enabled and URL is correct',
