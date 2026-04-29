@@ -51,11 +51,13 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
   try {
     // First, store the server URL (needed for all API calls)
     await setServerUrl(credentials.serverUrl);
-    
+
     // Dolibarr REST API login: /api/index.php/login
     const baseUrl = await getDolibarrApiUrl();
     const loginUrl = `${baseUrl}/login`;
     
+    console.log('Attempting login to:', loginUrl);
+
     const response = await fetch(loginUrl, {
       method: 'POST',
       headers: {
@@ -67,8 +69,35 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       }),
     });
     
-    const data = await response.json();
+    console.log('Response status:', response.status);
+
+    const contentType = response.headers.get('content-type');
+    console.log('Response content-type:', contentType);
     
+    let data: { token?: string; error?: string } = {};
+    
+    try {
+      const responseText = await response.text();
+      console.log('Raw response:', responseText.substring(0, 500));
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = JSON.parse(responseText);
+      } else {
+        // If not JSON, server might be returning HTML error page
+        console.error('Server returned non-JSON response');
+        return {
+          success: false,
+          error: 'Server error: Check if REST API module is enabled and URL is correct',
+        };
+      }
+    } catch (parseError) {
+      console.error('Failed to parse response:', parseError);
+      return {
+        success: false,
+        error: 'Invalid server response. Check server URL configuration.',
+      };
+    }
+
     if (response.ok && data.token) {
       await setAuthToken(data.token);
       return {
@@ -79,14 +108,14 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
 
     return {
       success: false,
-      error: data.error || 'Login failed',
+      error: data.error || `Login failed (HTTP ${response.status})`,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
     console.error('Login error:', message);
     return {
       success: false,
-      error: message,
+      error: `Connection error: ${message}. Check server URL and network.`,
     };
   }
 }

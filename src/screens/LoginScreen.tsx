@@ -81,12 +81,15 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         // Login successful - navigate to HomeScreen
         onLoginSuccess();
       } else {
-        // Login failed
-        setError(result.error || 'Login failed. Please check your credentials.');
+        // Login failed - show specific error from server
+        const errorMessage = result.error || 'Login failed. Please check your credentials.';
+        console.error('Login failed:', errorMessage);
+        setError(errorMessage);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Cannot connect to server. Check your connection.';
-      setError(message);
+      console.error('Login exception:', message);
+      setError(`Connection failed: ${message}`);
     } finally {
       setLoading(false);
     }
