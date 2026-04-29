@@ -84,7 +84,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         // Login failed - show specific error from server
         const errorMessage = result.error || 'Login failed. Please check your credentials.';
         console.error('Login failed:', errorMessage);
-        setError(errorMessage);
+        // Show full error with debug info in alert for debugging
+        Alert.alert('Login Failed', errorMessage);
+        setError(errorMessage.split('\n')[0]); // Show first line in the UI
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Cannot connect to server. Check your connection.';
