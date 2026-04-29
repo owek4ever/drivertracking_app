@@ -18,6 +18,7 @@ interface EmergencyContactsProps {
   dispatchPhone: string;
   customerPhone?: string;
   managerPhone: string;
+  isDark?: boolean;
 }
 
 interface ContactButtonProps {
@@ -72,11 +73,14 @@ export default function EmergencyContacts({
   dispatchPhone,
   customerPhone,
   managerPhone,
+  isDark = false,
 }: EmergencyContactsProps) {
   const hasCustomer = !!customerPhone && customerPhone.length > 0;
 
+  const backgroundColor = isDark ? '#1C1C1E' : '#FFFFFF';
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <Text style={styles.sectionTitle}>Emergency Contacts</Text>
       <View style={styles.buttonRow}>
         <ContactButton label="Dispatch" phone={dispatchPhone} />
@@ -93,7 +97,7 @@ export default function EmergencyContacts({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff', // Default, overridden by prop
     borderRadius: 12,
     padding: 16,
     marginTop: 12,

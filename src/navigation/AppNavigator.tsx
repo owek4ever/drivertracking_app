@@ -50,7 +50,7 @@ function BookingsStackNavigator() {
     <BookingsStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#007AFF',
+          backgroundColor: '#000000',
         },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: {
@@ -85,11 +85,11 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused }) => (
           <TabIcon name={route.name} focused={focused} />
         ),
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
-        headerStyle: {
-          backgroundColor: '#007AFF',
-        },
+tabBarActiveTintColor: '#FFFFFF',
+      tabBarInactiveTintColor: '#8E8E93',
+      headerStyle: {
+        backgroundColor: '#000000',
+      },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: {
           fontWeight: '600',

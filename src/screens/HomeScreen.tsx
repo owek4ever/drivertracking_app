@@ -224,25 +224,23 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Vehicle Status Bars - Mileage + Fuel */}
-        <VehicleStatusBars mileage={mileage} vehicleInfo={vehicleInfo} />
+{/* Vehicle Status Bars - Mileage + Fuel */}
+      <VehicleStatusBars mileage={mileage} vehicleInfo={vehicleInfo} isDark={isDark} />
 
-        {/* Task Schedule - Upcoming Bookings */}
-        <TaskSchedule
-          bookings={pendingBookings}
-          onBookingPress={handleNavigateToBookingDetail}
-        />
+      {/* Task Schedule - Upcoming Bookings */}
+      <TaskSchedule
+        bookings={pendingBookings}
+        onBookingPress={handleNavigateToBookingDetail}
+      />
 
-        {/* Emergency Contacts */}
-        <EmergencyContacts
-          dispatchPhone="1234567890"
-          customerPhone={activeBooking?.customer?.phone || pendingBookings[0]?.customer?.phone}
-          managerPhone="0987654321"
-        />
-
-        {/* Mileage Display (Legacy) */}
-        <MileageDisplay mileage={mileage} />
-      </ScrollView>
+      {/* Emergency Contacts */}
+      <EmergencyContacts
+        dispatchPhone="1234567890"
+        customerPhone={activeBooking?.customer?.phone || pendingBookings[0]?.customer?.phone}
+        managerPhone="0987654321"
+        isDark={isDark}
+      />
+    </ScrollView>
     </SafeAreaView>
   );
 }

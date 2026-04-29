@@ -11,11 +11,12 @@ import { MileageRecord, Vehicle } from '../types';
 interface VehicleStatusBarsProps {
   mileage: MileageRecord | null;
   vehicleInfo: Vehicle | null;
+  isDark?: boolean;
 }
 
 const SERVICE_INTERVAL = 5000;
 
-export default function VehicleStatusBars({ mileage, vehicleInfo }: VehicleStatusBarsProps) {
+export default function VehicleStatusBars({ mileage, vehicleInfo, isDark = false }: VehicleStatusBarsProps) {
   const currentMileage = mileage?.meter_out ?? null;
 
   const formatMileage = (value: number | null): string => {
@@ -48,8 +49,10 @@ export default function VehicleStatusBars({ mileage, vehicleInfo }: VehicleStatu
   const fuelColor = getFuelColor(fuelPercentage);
   const fuelLabel = getFuelLabel(fuelPercentage);
 
+  const backgroundColor = isDark ? '#1C1C1E' : '#FFFFFF';
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       {/* Mileage Bar */}
       <View style={styles.barSection}>
         <View style={styles.barHeader}>
@@ -97,7 +100,7 @@ export default function VehicleStatusBars({ mileage, vehicleInfo }: VehicleStatu
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF', // Default, overridden by prop
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
