@@ -5,7 +5,7 @@
  */
 
 import * as SecureStore from 'expo-secure-store';
-import { apiGet, apiPost, setAuthToken, clearAuthToken, getAuthToken, setServerUrl, clearAllAuth, ApiError } from './api';
+import { apiGet, apiPost, setAuthToken, clearAuthToken, getAuthToken, getServerUrl, setServerUrl, clearAllAuth, ApiError } from './api';
 import { AuthTokenResponse, ApiResponse, Driver } from '../types';
 
 // Storage keys
