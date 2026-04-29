@@ -74,14 +74,15 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     const contentType = response.headers.get('content-type');
     console.log('Response content-type:', contentType);
     
-    let data: { token?: string; error?: string } = {};
+    let data: { token?: string; error?: string; success?: boolean; message?: string } = {};
     
     try {
       const responseText = await response.text();
-      console.log('Raw response:', responseText.substring(0, 500));
+      console.log('Raw response:', responseText.substring(0, 1000));
       
       if (contentType && contentType.includes('application/json')) {
         data = JSON.parse(responseText);
+        console.log('Parsed data:', JSON.stringify(data, null, 2));
       } else {
         // If not JSON, server might be returning HTML error page
         console.error('Server returned non-JSON response');
@@ -98,7 +99,7 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       };
     }
 
-    if (response.ok && data.token) {
+    if (data.token) {
       await setAuthToken(data.token);
       return {
         success: true,
@@ -106,9 +107,18 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       };
     }
 
+    // Handle various error response formats from Dolibarr
+    // Dolibarr may return HTTP 200 with success: false and error message
+    const errorMessage = data.error || data.message || 
+      (data.success === false ? 'Login failed - check credentials' : null) ||
+      (Object.keys(data).length === 0 ? 'Empty response from server' : null) ||
+      `Login failed (HTTP ${response.status})`;
+    
+    console.log('Login error details:', errorMessage, 'Response data:', data);
+    
     return {
       success: false,
-      error: data.error || `Login failed (HTTP ${response.status})`,
+      error: errorMessage,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
