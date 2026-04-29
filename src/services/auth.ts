@@ -132,11 +132,15 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       };
     }
 
-    if (data.token) {
-      await setAuthToken(data.token);
+    // Dolibarr returns token inside "success" object: {"success": {"token": "...", "code": 200, ...}}
+    const successData = data.success as { token?: string; code?: number; message?: string } | undefined;
+    const token = successData?.token || data.token;
+    
+    if (token) {
+      await setAuthToken(token);
       return {
         success: true,
-        token: data.token,
+        token: token,
       };
     }
 
