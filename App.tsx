@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
 
 // Import screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -79,7 +80,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AppNavigator />
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
       </ThemeProvider>
     </SafeAreaProvider>
   );
