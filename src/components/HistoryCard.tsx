@@ -105,10 +105,15 @@ export default function HistoryCard({ booking, onPress }: HistoryCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   status_done: {
-    backgroundColor: '#34C759', // Green for done
+    backgroundColor: '#000000', // Black for done
   },
   status_cancelled: {
     backgroundColor: '#FF3B30', // Red for cancelled
@@ -185,6 +190,6 @@ const styles = StyleSheet.create({
   distanceValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000000',
   },
 });

@@ -26,13 +26,13 @@ export type BookingsStackParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const BookingsStack = createNativeStackNavigator<BookingsStackParamList>();
 
-// Simple icon component using text symbols
+// Simple icon component using Unicode line icons
 const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
   const icons: Record<string, string> = {
-    Home: '🏠',
-    Bookings: '📋',
-    History: '📜',
-    Profile: '👤',
+    Home: '\u2302',      // ⌂ - house
+    Bookings: '\u2630',  // ☰ - list/menu
+    History: '\u25A0',  // ■ - square/document
+    Profile: '\u263A',  // ☺ - user face
   };
 
   return (
@@ -85,8 +85,8 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused }) => (
           <TabIcon name={route.name} focused={focused} />
         ),
-tabBarActiveTintColor: '#FFFFFF',
-      tabBarInactiveTintColor: '#8E8E93',
+      tabBarActiveTintColor: '#FFFFFF',
+      tabBarInactiveTintColor: '#afafaf',
       headerStyle: {
         backgroundColor: '#000000',
       },
@@ -138,10 +138,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    fontSize: 20,
-    opacity: 0.6,
+    fontSize: 22,
+    color: '#afafaf',
   },
   iconFocused: {
-    opacity: 1,
+    color: '#FFFFFF',
   },
 });

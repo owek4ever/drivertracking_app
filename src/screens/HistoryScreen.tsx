@@ -48,7 +48,7 @@ export default function HistoryScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyIcon}>📜</Text>
+      <Text style={styles.emptyIcon}>{'\u25A0'}</Text>
       <Text style={styles.emptyTitle}>No Booking History</Text>
       <Text style={styles.emptyText}>
         Completed and cancelled bookings will appear here.
@@ -64,7 +64,7 @@ export default function HistoryScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <  ActivityIndicator size="large" color="#000000" />
           <Text style={styles.loadingText}>Loading history...</Text>
         </View>
       </SafeAreaView>
@@ -88,7 +88,7 @@ export default function HistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#007AFF"
+            tintColor="#000000"
           />
         }
       />
@@ -99,7 +99,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flex: 1,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8E8E93',
+    color: '#afafaf',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5EA',
   },
   filterButtonActive: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: '#000000',
+    borderColor: '#000000',
   },
   filterText: {
     fontSize: 14,
@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
   emptyIcon: {
     fontSize: 48,
     marginBottom: 16,
+    color: '#afafaf',
   },
   emptyTitle: {
     fontSize: 20,

@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import MileageDisplay from '../components/MileageDisplay';
+
 import EmergencyContacts from '../components/EmergencyContacts';
 import VehicleStatusBars from '../components/VehicleStatusBars';
 import TaskSchedule from '../components/TaskSchedule';
@@ -47,8 +47,8 @@ export default function HomeScreen() {
 
   // Theme colors
   const colors = {
-    background: isDark ? '#000000' : '#F2F2F7',
-    card: isDark ? '#1C1C1E' : '#FFFFFF',
+    background: isDark ? '#000000' : '#ffffff',
+    card: isDark ? '#1C1C1E' : '#ffffff',
     text: isDark ? '#FFFFFF' : '#000000',
     textSecondary: isDark ? '#8E8E93' : '#8E8E93',
     border: isDark ? '#38383A' : '#E5E5EA',
@@ -65,7 +65,7 @@ export default function HomeScreen() {
           onPress={toggleTheme}
           activeOpacity={0.7}
         >
-          <Text style={styles.themeToggleText}>{isDark ? '☀️' : '🌙'}</Text>
+          <Text style={styles.themeToggleText}>{isDark ? '\u2600' : '\u263E'}</Text>
         </TouchableOpacity>
       ),
     });
@@ -102,7 +102,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.accent} />
+          <ActivityIndicator size="large" color="#000000" />
           <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading...</Text>
         </View>
       </SafeAreaView>
@@ -282,10 +282,11 @@ const styles = StyleSheet.create({
     marginRight: 16,
     padding: 8,
     borderRadius: 999,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#efefef',
   },
   themeToggleText: {
-    fontSize: 20,
+    fontSize: 18,
+    color: '#000000',
   },
   welcomeCard: {
     borderRadius: 12,
@@ -298,13 +299,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    opacity: 0.8,
+    color: '#afafaf',
     marginTop: 4,
   },
   statusCard: {
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    backgroundColor: '#ffffff',
     shadowColor: 'rgba(0, 0, 0, 0.12)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
@@ -389,6 +391,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    backgroundColor: '#ffffff',
     shadowColor: 'rgba(0, 0, 0, 0.12)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,

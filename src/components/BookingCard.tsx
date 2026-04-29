@@ -14,19 +14,19 @@ interface BookingCardProps {
 }
 
 export default function BookingCard({ booking, onPress }: BookingCardProps) {
-  // Get status badge color
+  // Get status badge color - black/white design system
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
       case 'confirmed':
-        return '#34C759';
+        return '#000000';
       case 'in_progress':
-        return '#007AFF';
+        return '#000000';
       case 'done':
-        return '#8E8E93';
+        return '#4b4b4b';
       case 'cancelled':
         return '#FF3B30';
       default:
-        return '#8E8E93';
+        return '#afafaf';
     }
   };
 
@@ -76,10 +76,15 @@ export default function BookingCard({ booking, onPress }: BookingCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -133,6 +138,6 @@ const styles = StyleSheet.create({
   distance: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000000',
   },
 });

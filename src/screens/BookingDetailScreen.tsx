@@ -176,19 +176,19 @@ export default function BookingDetailScreen({ route, navigation }: BookingDetail
     }
   };
 
-  // Get status badge color
+  // Get status badge color - black/white design system
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return '#34C759';
+        return '#000000';
       case 'in_progress':
-        return '#007AFF';
+        return '#000000';
       case 'done':
-        return '#8E8E93';
+        return '#4b4b4b';
       case 'cancelled':
         return '#FF3B30';
       default:
-        return '#8E8E93';
+        return '#afafaf';
     }
   };
 
@@ -258,7 +258,7 @@ export default function BookingDetailScreen({ route, navigation }: BookingDetail
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <  ActivityIndicator size="large" color="#000000" />
           <Text style={styles.loadingText}>Loading booking...</Text>
         </View>
       </SafeAreaView>
@@ -294,70 +294,70 @@ export default function BookingDetailScreen({ route, navigation }: BookingDetail
           </View>
         </View>
 
-        {/* Pickup Section */}
+  {/* Pickup Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionIcon}>{'\u25A0'}</Text>
+          <Text style={styles.sectionTitle}>Pickup</Text>
+        </View>
+        <Text style={styles.address}>{booking.departure_address}</Text>
+        <Text style={styles.dateTime}>
+          {formatDateTime(booking.pickup_datetime)}
+        </Text>
+      </View>
+
+      {/* Dropoff Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionIcon}>{'\u25A1'}</Text>
+          <Text style={styles.sectionTitle}>Dropoff</Text>
+        </View>
+        <Text style={styles.address}>{booking.arriving_address}</Text>
+        <Text style={styles.dateTime}>
+          {formatDateTime(booking.dropoff_datetime)}
+        </Text>
+      </View>
+
+      {/* Customer Section */}
+      {customer && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>📍</Text>
-            <Text style={styles.sectionTitle}>Pickup</Text>
+            <Text style={styles.sectionIcon}>{'\u263A'}</Text>
+            <Text style={styles.sectionTitle}>Customer</Text>
           </View>
-          <Text style={styles.address}>{booking.departure_address}</Text>
-          <Text style={styles.dateTime}>
-            {formatDateTime(booking.pickup_datetime)}
+          <Text style={styles.customerName}>
+            {customer.firstname} {customer.lastname}
+            {customer.company_name && ` (${customer.company_name})`}
           </Text>
+          {customer.phone && (
+            <TouchableOpacity onPress={handleCallCustomer} style={styles.phoneButton}>
+              <Text style={styles.phoneText}>{'\u260F'} {customer.phone}</Text>
+            </TouchableOpacity>
+          )}
         </View>
+      )}
 
-        {/* Dropoff Section */}
+      {/* Distance Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionIcon}>{'\u2014'}</Text>
+          <Text style={styles.sectionTitle}>Distance</Text>
+        </View>
+        <Text style={styles.distance}>
+          {booking.distance ? `${booking.distance} km` : 'Not specified'}
+        </Text>
+      </View>
+
+      {/* ETA Section */}
+      {booking.eta && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>🏁</Text>
-            <Text style={styles.sectionTitle}>Dropoff</Text>
+            <Text style={styles.sectionIcon}>{'\u23F1'}</Text>
+            <Text style={styles.sectionTitle}>Estimated Arrival</Text>
           </View>
-          <Text style={styles.address}>{booking.arriving_address}</Text>
-          <Text style={styles.dateTime}>
-            {formatDateTime(booking.dropoff_datetime)}
-          </Text>
+          <Text style={styles.eta}>{booking.eta}</Text>
         </View>
-
-        {/* Customer Section */}
-        {customer && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>👤</Text>
-              <Text style={styles.sectionTitle}>Customer</Text>
-            </View>
-            <Text style={styles.customerName}>
-              {customer.firstname} {customer.lastname}
-              {customer.company_name && ` (${customer.company_name})`}
-            </Text>
-            {customer.phone && (
-              <TouchableOpacity onPress={handleCallCustomer} style={styles.phoneButton}>
-                <Text style={styles.phoneText}>📞 {customer.phone}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {/* Distance Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>📏</Text>
-            <Text style={styles.sectionTitle}>Distance</Text>
-          </View>
-          <Text style={styles.distance}>
-            {booking.distance ? `${booking.distance} km` : 'Not specified'}
-          </Text>
-        </View>
-
-        {/* ETA Section */}
-        {booking.eta && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>⏱️</Text>
-              <Text style={styles.sectionTitle}>Estimated Arrival</Text>
-            </View>
-            <Text style={styles.eta}>{booking.eta}</Text>
-          </View>
-        )}
+      )}
       </ScrollView>
 
       {/* Action Buttons */}
@@ -371,7 +371,7 @@ export default function BookingDetailScreen({ route, navigation }: BookingDetail
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   scrollView: {
     flex: 1,
@@ -402,10 +402,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000000',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 999,
   },
   retryButtonText: {
     color: '#FFFFFF',
@@ -416,10 +416,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   bookingRef: {
     fontSize: 24,
@@ -438,10 +443,15 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   section: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -478,12 +488,13 @@ const styles = StyleSheet.create({
   },
   phoneText: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#000000',
+    textDecorationLine: 'underline',
   },
   distance: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#000000',
   },
   eta: {
     fontSize: 16,
@@ -500,8 +511,8 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E5EA',
   },
   primaryButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
+    backgroundColor: '#000000',
+    borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
   },
@@ -526,8 +537,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   completeButton: {
-    backgroundColor: '#34C759',
-    borderColor: '#34C759',
+    backgroundColor: '#000000',
+    borderColor: '#000000',
     flex: 1,
     marginLeft: 8,
   },
@@ -538,7 +549,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   completedContainer: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#efefef',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

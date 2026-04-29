@@ -58,7 +58,7 @@ export default function App() {
     return (
       <SafeAreaProvider>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <  ActivityIndicator size="large" color="#000000" />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       </SafeAreaProvider>
@@ -93,11 +93,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8E8E93',
+    color: '#afafaf',
   },
 });

@@ -61,7 +61,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   content: {
     flex: 1,
@@ -70,15 +70,20 @@ const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     marginBottom: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -99,10 +104,15 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
   },
   infoCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 14,
@@ -126,10 +136,15 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
   },
   actionsCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginTop: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   actionRow: {
     paddingVertical: 12,

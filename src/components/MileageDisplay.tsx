@@ -95,10 +95,15 @@ export default function MileageDisplay({ mileage }: MileageDisplayProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -154,7 +159,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#000000',
     borderRadius: 4,
   },
   progressLabels: {
@@ -181,7 +186,7 @@ const styles = StyleSheet.create({
   serviceValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#34C759',
+    color: '#000000',
     marginLeft: 4,
   },
 });

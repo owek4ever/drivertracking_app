@@ -57,7 +57,7 @@ const ContactButton: React.FC<ContactButtonProps> = ({
       activeOpacity={0.7}
     >
       <Text style={[styles.buttonIcon, disabled && styles.textDisabled]}>
-        📞
+        {'\u260F'}
       </Text>
       <Text style={[styles.buttonLabel, disabled && styles.textDisabled]}>
         {label}
@@ -98,17 +98,14 @@ export default function EmergencyContacts({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#ffffff', // Default, overridden by prop
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 16,
     marginTop: 12,
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
     shadowRadius: 16,
-    elevation: 3,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 14,
@@ -148,8 +145,7 @@ const styles = StyleSheet.create({
   },
   buttonPhone: {
     fontSize: 10,
-    color: '#ffffff',
-    opacity: 0.8,
+    color: '#afafaf',
     textAlign: 'center',
     marginTop: 2,
   },

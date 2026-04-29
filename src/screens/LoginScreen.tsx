@@ -199,7 +199,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   keyboardView: {
     flex: 1,
@@ -238,8 +238,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F2F2F7',
-    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#000000',
+    borderRadius: 8,
     padding: 14,
     fontSize: 16,
     color: '#000000',
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     backgroundColor: '#000000',
-    borderRadius: 10,
+    borderRadius: 999,
     padding: 16,
     alignItems: 'center',
     marginTop: 8,

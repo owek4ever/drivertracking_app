@@ -50,19 +50,19 @@ export default function BookingsScreen() {
     navigation.navigate('BookingDetail', { bookingId });
   };
 
-  // Get status badge color
+  // Get status badge color - black/white design system
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {
       case 'confirmed':
-        return '#34C759';
+        return '#000000';
       case 'in_progress':
-        return '#007AFF';
+        return '#000000';
       case 'done':
-        return '#8E8E93';
+        return '#4b4b4b';
       case 'cancelled':
         return '#FF3B30';
       default:
-        return '#8E8E93';
+        return '#afafaf';
     }
   };
 
@@ -78,7 +78,7 @@ export default function BookingsScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyIcon}>📋</Text>
+      <Text style={styles.emptyIcon}>{'\u2630'}</Text>
       <Text style={styles.emptyTitle}>
         {activeTab === 'pending' ? 'No Pending Bookings' : 'No In-Progress Bookings'}
       </Text>
@@ -143,7 +143,7 @@ export default function BookingsScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <  ActivityIndicator size="large" color="#000000" />
           <Text style={styles.loadingText}>Loading bookings...</Text>
         </View>
       ) : (
@@ -157,8 +157,8 @@ export default function BookingsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              colors={['#007AFF']}
-              tintColor="#007AFF"
+  colors={['#000000']}
+          tintColor="#000000"
             />
           }
         />
@@ -170,11 +170,11 @@ export default function BookingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#ffffff',
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderBottomWidth: 1,
@@ -188,15 +188,15 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#007AFF',
+    borderBottomColor: '#000000',
   },
   tabText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#8E8E93',
+    color: '#afafaf',
   },
   activeTabText: {
-    color: '#007AFF',
+    color: '#000000',
   },
   loadingContainer: {
     flex: 1,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8E8E93',
+    color: '#afafaf',
   },
   list: {
     padding: 16,
@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
   emptyIcon: {
     fontSize: 48,
     marginBottom: 16,
+    color: '#afafaf',
   },
   emptyTitle: {
     fontSize: 20,
@@ -235,10 +236,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   bookingCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
   bookingHeader: {
     flexDirection: 'row',
@@ -289,6 +295,6 @@ const styles = StyleSheet.create({
   distance: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#000000',
   },
 });
