@@ -44,15 +44,6 @@ const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
   );
 };
 
-  return (
-    <View style={styles.iconContainer}>
-      <Text style={[styles.icon, focused && styles.iconFocused]}>
-        {icons[name] || '•'}
-      </Text>
-    </View>
-  );
-};
-
 // Bookings stack navigator
 function BookingsStackNavigator() {
   return (
