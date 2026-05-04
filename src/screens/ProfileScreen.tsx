@@ -1,7 +1,31 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
+import { logout as authLogout } from '../services/auth';
 
 export default function ProfileScreen() {
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout? You will need to restart the app.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await authLogout();
+              Alert.alert('Logged Out', 'Please restart the app to log in again.');
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -15,17 +39,17 @@ export default function ProfileScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
-          
+
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Phone</Text>
             <Text style={styles.infoValue}>+33 6 00 00 00 00</Text>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>License Number</Text>
             <Text style={styles.infoValue}>--</Text>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>License Expiry</Text>
             <Text style={styles.infoValue}>--</Text>
@@ -34,12 +58,12 @@ export default function ProfileScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Assigned Vehicle</Text>
-          
+
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Vehicle</Text>
             <Text style={styles.infoValue}>Not assigned</Text>
           </View>
-          
+
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>License Plate</Text>
             <Text style={styles.infoValue}>--</Text>
@@ -48,10 +72,10 @@ export default function ProfileScreen() {
 
         <View style={styles.actionsCard}>
           <Text style={styles.sectionTitle}>Account</Text>
-          
-          <View style={styles.actionRow}>
+
+          <TouchableOpacity style={styles.actionRow} onPress={handleLogout}>
             <Text style={styles.actionText}>Logout</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

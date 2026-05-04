@@ -4,9 +4,10 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationState } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Import screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -32,10 +33,17 @@ export default function App() {
     }
   }, []);
 
-  // Check auth on mount
+  // Check auth on mount and when app comes into focus
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Re-check auth when app gains focus (e.g., after returning from background)
+  useFocusEffect(
+    useCallback(() => {
+      checkAuth();
+    }, [checkAuth])
+  );
 
   // Handle successful login
   const handleLoginSuccess = useCallback(() => {
