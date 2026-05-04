@@ -4,10 +4,9 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, AppState, AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer, useNavigationState } from '@react-navigation/native';
-import { useFocusEffect } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 
 // Import screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -33,17 +32,22 @@ export default function App() {
     }
   }, []);
 
-  // Check auth on mount and when app comes into focus
+  // Check auth on mount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  // Re-check auth when app gains focus (e.g., after returning from background)
-  useFocusEffect(
-    useCallback(() => {
-      checkAuth();
-    }, [checkAuth])
-  );
+  // Re-check auth when app comes to foreground
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        checkAuth();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, [checkAuth]);
 
   // Handle successful login
   const handleLoginSuccess = useCallback(() => {

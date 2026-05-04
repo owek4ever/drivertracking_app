@@ -15,6 +15,7 @@ import {
   Alert,
   ActivityIndicator,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Booking, Customer } from '../types';
@@ -283,8 +284,13 @@ export default function BookingDetailScreen({ route, navigation }: BookingDetail
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#000000"
+          />
+        }
       >
         {/* Header */}
         <View style={styles.header}>
