@@ -26,14 +26,23 @@ export type BookingsStackParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const BookingsStack = createNativeStackNavigator<BookingsStackParamList>();
 
-// Simple icon component using Unicode line icons
+// Tab icon component with consistent styling per Uber design system
 const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
   const icons: Record<string, string> = {
-    Home: '\u2302',      // ⌂ - house
-    Bookings: '\u2630',  // ☰ - list/menu
-    History: '\u25A0',  // ■ - square/document
-    Profile: '\u263A',  // ☺ - user face
+    Home: '⌂',      // House
+    Bookings: '☰',  // Menu/List
+    History: '◷',   // Clock-like symbol
+    Profile: '○',   // Circle for user
   };
+
+  return (
+    <View style={styles.iconContainer}>
+      <Text style={[styles.icon, focused && styles.iconFocused]}>
+        {icons[name] || '•'}
+      </Text>
+    </View>
+  );
+};
 
   return (
     <View style={styles.iconContainer}>
@@ -52,7 +61,7 @@ function BookingsStackNavigator() {
         headerStyle: {
           backgroundColor: '#000000',
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
           fontWeight: '600',
         },
@@ -85,12 +94,19 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused }) => (
           <TabIcon name={route.name} focused={focused} />
         ),
-      tabBarActiveTintColor: '#FFFFFF',
-      tabBarInactiveTintColor: '#afafaf',
-      headerStyle: {
-        backgroundColor: '#000000',
-      },
-        headerTintColor: '#FFFFFF',
+        tabBarActiveTintColor: '#000000',
+        tabBarInactiveTintColor: '#afafaf',
+        tabBarStyle: {
+          backgroundColor: '#ffffff',
+          borderTopWidth: 1,
+          borderTopColor: '#E5E5EA',
+          elevation: 0,
+          shadowColor: 'transparent',
+        },
+        headerStyle: {
+          backgroundColor: '#000000',
+        },
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
           fontWeight: '600',
         },
@@ -138,10 +154,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    fontSize: 22,
+    fontSize: 24,
     color: '#afafaf',
+    fontWeight: '400',
   },
   iconFocused: {
-    color: '#FFFFFF',
+    color: '#000000',
+    fontWeight: '600',
   },
 });

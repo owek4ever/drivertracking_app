@@ -30,7 +30,7 @@ interface HomeScreenProps {
 
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme, isDark, toggleTheme, colors } = useTheme();
   const {
     driverInfo,
     vehicleInfo,
@@ -45,31 +45,28 @@ export default function HomeScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  // Theme colors
-  const colors = {
-    background: isDark ? '#000000' : '#ffffff',
-    card: isDark ? '#1C1C1E' : '#ffffff',
-    text: isDark ? '#FFFFFF' : '#000000',
-    textSecondary: isDark ? '#8E8E93' : '#8E8E93',
-    border: isDark ? '#38383A' : '#E5E5EA',
-    accent: '#000000',
-    accentText: '#FFFFFF',
-  };
+  // Use centralized theme colors from ThemeContext
 
   useEffect(() => {
     // Set up header with theme toggle
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          style={styles.themeToggle}
+          style={[styles.themeToggle, { backgroundColor: colors.secondary }]}
           onPress={toggleTheme}
           activeOpacity={0.7}
         >
-          <Text style={styles.themeToggleText}>{isDark ? '\u2600' : '\u263E'}</Text>
+          <Text style={[styles.themeToggleText, { color: colors.text }]}>
+            {isDark ? '☀' : '☾'}
+          </Text>
         </TouchableOpacity>
       ),
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTintColor: colors.primaryText,
     });
-  }, [navigation, toggleTheme, isDark]);
+  }, [navigation, toggleTheme, isDark, colors]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -102,7 +99,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000000" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading...</Text>
         </View>
       </SafeAreaView>
@@ -113,7 +110,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.errorContainer}>
-          <Text style={[styles.errorText, { color: '#FF3B30' }]}>Session expired</Text>
+          <Text style={[styles.errorText, { color: colors.error }]}>Session expired</Text>
           <Text style={[styles.errorHint, { color: colors.textSecondary }]}>Please log in again</Text>
         </View>
       </SafeAreaView>
@@ -126,23 +123,23 @@ export default function HomeScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.accent]}
-            tintColor={colors.accent}
-          />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={[colors.primary]}
+          tintColor={colors.primary}
+        />
         }
       >
-        {/* Welcome Card - Uber Black */}
-        <View style={[styles.welcomeCard, { backgroundColor: colors.accent }]}>
-          <Text style={[styles.welcomeText, { color: colors.accentText }]}>
-            Welcome, {driverInfo ? `${driverInfo.firstname}` : 'Driver'}
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.accentText }]}>
-            {activeBooking ? 'You have an active booking' : 'Ready to start your day'}
-          </Text>
-        </View>
+      {/* Welcome Card - Uber Black */}
+      <View style={[styles.welcomeCard, { backgroundColor: colors.primary }]}>
+        <Text style={[styles.welcomeText, { color: colors.primaryText }]}>
+          Welcome, {driverInfo ? `${driverInfo.firstname}` : 'Driver'}
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.primaryText }]}>
+          {activeBooking ? 'You have an active booking' : 'Ready to start your day'}
+        </Text>
+      </View>
 
         {/* Active Booking Card */}
         {activeBooking ? (
@@ -224,8 +221,8 @@ export default function HomeScreen() {
           )}
         </View>
 
-{/* Vehicle Status Bars - Mileage + Fuel */}
-      <VehicleStatusBars mileage={mileage} vehicleInfo={vehicleInfo} isDark={isDark} />
+      {/* Vehicle Status Bars - Mileage + Fuel */}
+      <VehicleStatusBars mileage={mileage} vehicleInfo={vehicleInfo} />
 
       {/* Task Schedule - Upcoming Bookings */}
       <TaskSchedule
@@ -238,7 +235,6 @@ export default function HomeScreen() {
         dispatchPhone="1234567890"
         customerPhone={activeBooking?.customer?.phone || pendingBookings[0]?.customer?.phone}
         managerPhone="0987654321"
-        isDark={isDark}
       />
     </ScrollView>
     </SafeAreaView>
@@ -282,11 +278,9 @@ const styles = StyleSheet.create({
     marginRight: 16,
     padding: 8,
     borderRadius: 999,
-    backgroundColor: '#efefef',
   },
   themeToggleText: {
     fontSize: 18,
-    color: '#000000',
   },
   welcomeCard: {
     borderRadius: 12,

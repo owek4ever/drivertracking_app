@@ -6,12 +6,32 @@ A mobile app for delivery drivers to manage bookings (missions) with real-time s
 
 ## Phases
 
+- [x] **Phase 0: UI Overhaul** - Fix UI/UX issues before Phase 4
 - [x] **Phase 1: Booking Management** - Drivers manage bookings/missions
-- [ ] **Phase 2: Delivery Jobs** (same as original) - Drivers view and update deliveries
-- [ ] **Phase 3: UI Polish** - Emergency contacts, vehicle status, themes
+- [x] **Phase 2: Auth + API Wiring** - Login and backend integration
+- [x] **Phase 3: UI Polish** - Emergency contacts, vehicle status, themes
 - [ ] **Phase 4: Profile** - Driver profile editing, photo upload, language
 
 ## Phase Details
+
+### Phase 0: UI Overhaul
+**Goal**: Fix all current UI/UX issues before proceeding to Phase 4
+**Depends on**: Phase 3 (UI Polish was already complete)
+**Requirements**: UI-01, UI-02, UI-03, UI-04 (fixes)
+**Success Criteria** (what must be TRUE):
+1. Home screen has white background in both themes
+2. Tab bar active tab is clearly visible (black on white)
+3. Progress bars show empty state when no data
+4. All components respect dark/light theme consistently
+5. Theme toggle uses professional icons
+6. All tab icons are consistent style
+**Plans**: 4 plans
+
+Plans:
+- [x] 00-01: Fix theme system and background colors
+- [x] 00-02: Fix tab bar and navigation styling
+- [x] 00-03: Fix progress bars and component consistency
+- [x] 00-04: Update theme toggle icons and tab icons
 
 ### Phase 1: Booking Management
 **Goal**: Drivers can view and manage assigned bookings/missions
@@ -83,10 +103,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-1 → 2 → 3 → 4
+0 → 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
+| 0. UI Overhaul | 4/4 | Complete | 2026-04-29 |
 | 1. Booking Management | 3/3 | Complete | 2026-04-27 |
 | 2. Auth + API Wiring | 2/2 | Complete | 2026-04-27 |
 | 3. UI Polish | 2/2 | Complete | 2026-04-27 |

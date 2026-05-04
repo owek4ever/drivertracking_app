@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Booking } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 interface TaskScheduleProps {
   bookings: Booking[];
@@ -14,6 +15,8 @@ interface TaskScheduleProps {
 }
 
 export default function TaskSchedule({ bookings, onBookingPress }: TaskScheduleProps) {
+  const { colors } = useTheme();
+
   // Sort by scheduled date/pickup time and take first 5
   const sortedBookings = [...bookings]
     .sort((a, b) => {
@@ -48,45 +51,45 @@ export default function TaskSchedule({ bookings, onBookingPress }: TaskScheduleP
 
   const renderBookingItem = ({ item }: { item: Booking }) => (
     <TouchableOpacity
-      style={styles.bookingItem}
+      style={[styles.bookingItem, { borderBottomColor: colors.divider }]}
       onPress={() => onBookingPress?.(item.id)}
       activeOpacity={0.7}
     >
-      <View style={styles.bookingTimeContainer}>
-        <Text style={styles.bookingTime}>
+      <View style={[styles.bookingTimeContainer, { backgroundColor: colors.primary }]}>
+        <Text style={[styles.bookingTime, { color: colors.primaryText }]}>
           {formatDateTime(item.scheduled_date || item.pickup_datetime)}
         </Text>
       </View>
       <View style={styles.bookingDetails}>
-        <Text style={styles.customerName} numberOfLines={1}>
+        <Text style={[styles.customerName, { color: colors.text }]} numberOfLines={1}>
           {getCustomerName(item)}
         </Text>
-        <Text style={styles.bookingRef}>{item.ref}</Text>
-        <Text style={styles.destination} numberOfLines={1}>
+        <Text style={[styles.bookingRef, { color: colors.textMuted }]}>{item.ref}</Text>
+        <Text style={[styles.destination, { color: colors.textSecondary }]} numberOfLines={1}>
           → {item.arriving_address}
         </Text>
       </View>
-      <View style={styles.arrowContainer}>
-        <Text style={styles.arrow}>→</Text>
+      <View style={[styles.arrowContainer, { backgroundColor: colors.secondary }]}>
+        <Text style={[styles.arrow, { color: colors.text }]}>→</Text>
       </View>
     </TouchableOpacity>
   );
 
   if (sortedBookings.length === 0) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Upcoming Tasks</Text>
+      <View style={[styles.container, { backgroundColor: colors.card }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Upcoming Tasks</Text>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No pending tasks</Text>
-          <Text style={styles.emptyHint}>Your schedule is clear</Text>
+          <Text style={[styles.emptyText, { color: colors.text }]}>No pending tasks</Text>
+          <Text style={[styles.emptyHint, { color: colors.textMuted }]}>Your schedule is clear</Text>
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Upcoming Tasks</Text>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
+      <Text style={[styles.title, { color: colors.text }]}>Upcoming Tasks</Text>
       <FlatList
         data={sortedBookings}
         renderItem={renderBookingItem}
@@ -99,7 +102,6 @@ export default function TaskSchedule({ bookings, onBookingPress }: TaskScheduleP
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
@@ -112,7 +114,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#000000',
     marginBottom: 12,
   },
   bookingItem: {
@@ -120,10 +121,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
   },
   bookingTimeContainer: {
-    backgroundColor: '#000000',
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -132,7 +131,6 @@ const styles = StyleSheet.create({
   bookingTime: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   bookingDetails: {
     flex: 1,
@@ -140,30 +138,25 @@ const styles = StyleSheet.create({
   customerName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000000',
   },
   bookingRef: {
     fontSize: 12,
-    color: '#8E8E93',
     marginTop: 2,
   },
   destination: {
     fontSize: 12,
-    color: '#4B4B4B',
     marginTop: 2,
   },
   arrowContainer: {
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: '#EFEFEF',
     justifyContent: 'center',
     alignItems: 'center',
   },
   arrow: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#000000',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -172,11 +165,9 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
   },
   emptyHint: {
     fontSize: 14,
-    color: '#8E8E93',
     marginTop: 4,
   },
 });

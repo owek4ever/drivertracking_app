@@ -13,12 +13,12 @@ import {
   Linking,
   Alert,
 } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 interface EmergencyContactsProps {
   dispatchPhone: string;
   customerPhone?: string;
   managerPhone: string;
-  isDark?: boolean;
 }
 
 interface ContactButtonProps {
@@ -28,41 +28,60 @@ interface ContactButtonProps {
   disabled?: boolean;
 }
 
-const ContactButton: React.FC<ContactButtonProps> = ({
+const ContactButton: React.FC<ContactButtonProps & { colors: any }> = ({
   label,
   phone,
   disabled = false,
+  colors,
 }) => {
   const handlePress = () => {
     const url = `tel:${phone}`;
     Linking.canOpenURL(url)
-      .then((supported) => {
-        if (supported) {
-          Linking.openURL(url);
-        } else {
-          Alert.alert('Error', 'Phone call not supported on this device');
-        }
-      })
-      .catch((err) => {
-        console.error('Error opening phone dialer:', err);
-        Alert.alert('Error', 'Failed to open phone dialer');
-      });
+    .then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'Phone call not supported on this device');
+      }
+    })
+    .catch((err) => {
+      console.error('Error opening phone dialer:', err);
+      Alert.alert('Error', 'Failed to open phone dialer');
+    });
   };
 
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.buttonDisabled]}
+      style={[
+        styles.button,
+        { backgroundColor: disabled ? colors.secondary : colors.primary },
+      ]}
       onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.7}
     >
-      <Text style={[styles.buttonIcon, disabled && styles.textDisabled]}>
+      <Text
+        style={[
+          styles.buttonIcon,
+          { color: disabled ? colors.textMuted : colors.primaryText },
+        ]}
+      >
         {'\u260F'}
       </Text>
-      <Text style={[styles.buttonLabel, disabled && styles.textDisabled]}>
+      <Text
+        style={[
+          styles.buttonLabel,
+          { color: disabled ? colors.textMuted : colors.primaryText },
+        ]}
+      >
         {label}
       </Text>
-      <Text style={[styles.buttonPhone, disabled && styles.textDisabled]}>
+      <Text
+        style={[
+          styles.buttonPhone,
+          { color: disabled ? colors.textMuted : colors.textMuted },
+        ]}
+      >
         {disabled ? '--' : phone}
       </Text>
     </TouchableOpacity>
@@ -73,23 +92,24 @@ export default function EmergencyContacts({
   dispatchPhone,
   customerPhone,
   managerPhone,
-  isDark = false,
 }: EmergencyContactsProps) {
+  const { colors } = useTheme();
   const hasCustomer = !!customerPhone && customerPhone.length > 0;
 
-  const backgroundColor = isDark ? '#1C1C1E' : '#FFFFFF';
-
   return (
-    <View style={[styles.container, { backgroundColor }]}>
-      <Text style={styles.sectionTitle}>Emergency Contacts</Text>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
+      <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
+        Emergency Contacts
+      </Text>
       <View style={styles.buttonRow}>
-        <ContactButton label="Dispatch" phone={dispatchPhone} />
+        <ContactButton label="Dispatch" phone={dispatchPhone} colors={colors} />
         <ContactButton
           label="Customer"
           phone={customerPhone || ''}
           disabled={!hasCustomer}
+          colors={colors}
         />
-        <ContactButton label="Manager" phone={managerPhone} />
+        <ContactButton label="Manager" phone={managerPhone} colors={colors} />
       </View>
     </View>
   );
